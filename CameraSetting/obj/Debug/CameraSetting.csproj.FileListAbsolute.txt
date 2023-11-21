@@ -1,0 +1,15 @@
+C:\Users\goodc\OneDrive\Desktop\Git\Digital_Image_Processing_and_Analysis_Tool - 複製\CameraSetting\bin\Debug\ClassLibrary1.dll
+C:\Users\goodc\OneDrive\Desktop\Git\Digital_Image_Processing_and_Analysis_Tool - 複製\CameraSetting\bin\Debug\ClassLibrary1.pdb
+C:\Users\goodc\OneDrive\Desktop\Git\Digital_Image_Processing_and_Analysis_Tool - 複製\CameraSetting\obj\Debug\CameraSetting.UserControlOfCameraSetting.resources
+C:\Users\goodc\OneDrive\Desktop\Git\Digital_Image_Processing_and_Analysis_Tool - 複製\CameraSetting\obj\Debug\CameraSetting.csproj.GenerateResource.cache
+C:\Users\goodc\OneDrive\Desktop\Git\Digital_Image_Processing_and_Analysis_Tool - 複製\CameraSetting\obj\Debug\CameraSetting.csproj.CoreCompileInputs.cache
+C:\Users\goodc\OneDrive\Desktop\Git\Digital_Image_Processing_and_Analysis_Tool - 複製\CameraSetting\obj\Debug\ClassLibrary1.dll
+C:\Users\goodc\OneDrive\Desktop\Git\Digital_Image_Processing_and_Analysis_Tool - 複製\CameraSetting\obj\Debug\ClassLibrary1.pdb
+C:\Users\goodc\OneDrive\Desktop\Git\Digital_Image_Processing_and_Analysis_Tool\CameraSetting\bin\Debug\ClassLibrary1.dll
+C:\Users\goodc\OneDrive\Desktop\Git\Digital_Image_Processing_and_Analysis_Tool\CameraSetting\bin\Debug\ClassLibrary1.pdb
+C:\Users\goodc\OneDrive\Desktop\Git\Digital_Image_Processing_and_Analysis_Tool\CameraSetting\obj\Debug\CameraSetting.csproj.AssemblyReference.cache
+C:\Users\goodc\OneDrive\Desktop\Git\Digital_Image_Processing_and_Analysis_Tool\CameraSetting\obj\Debug\CameraSetting.UserControlOfCameraSetting.resources
+C:\Users\goodc\OneDrive\Desktop\Git\Digital_Image_Processing_and_Analysis_Tool\CameraSetting\obj\Debug\CameraSetting.csproj.GenerateResource.cache
+C:\Users\goodc\OneDrive\Desktop\Git\Digital_Image_Processing_and_Analysis_Tool\CameraSetting\obj\Debug\CameraSetting.csproj.CoreCompileInputs.cache
+C:\Users\goodc\OneDrive\Desktop\Git\Digital_Image_Processing_and_Analysis_Tool\CameraSetting\obj\Debug\ClassLibrary1.dll
+C:\Users\goodc\OneDrive\Desktop\Git\Digital_Image_Processing_and_Analysis_Tool\CameraSetting\obj\Debug\ClassLibrary1.pdb

@@ -1,0 +1,9 @@
+C:\Users\goodc\OneDrive\Desktop\Git\Digital_Image_Processing_and_Analysis_Tool - 複製\ImageProcessing\x64\Debug\ImageProcessing.vcxproj.AssemblyReference.cache
+C:\Users\goodc\OneDrive\Desktop\Git\Digital_Image_Processing_and_Analysis_Tool - 複製\ImageProcessing\x64\Debug\ImageProcessing.LoginForm.resources
+C:\Users\goodc\OneDrive\Desktop\Git\Digital_Image_Processing_and_Analysis_Tool - 複製\ImageProcessing\x64\Debug\ImageProcessing.MyForm.resources
+C:\Users\goodc\OneDrive\Desktop\Git\Digital_Image_Processing_and_Analysis_Tool - 複製\ImageProcessing\x64\Debug\ImageProcessing.vcxproj.GenerateResource.cache
+C:\Users\goodc\OneDrive\Desktop\Git\Digital_Image_Processing_and_Analysis_Tool - 複製\ImageProcessing\x64\Debug\ImageProcessing.vcxproj.CopyComplete
+C:\Users\goodc\OneDrive\Desktop\Git\Digital_Image_Processing_and_Analysis_Tool\ImageProcessing\x64\Debug\ImageProcessing.LoginForm.resources
+C:\Users\goodc\OneDrive\Desktop\Git\Digital_Image_Processing_and_Analysis_Tool\ImageProcessing\x64\Debug\ImageProcessing.MyForm.resources
+C:\Users\goodc\OneDrive\Desktop\Git\Digital_Image_Processing_and_Analysis_Tool\ImageProcessing\x64\Debug\ImageProcessing.vcxproj.GenerateResource.cache
+C:\Users\goodc\OneDrive\Desktop\Git\Digital_Image_Processing_and_Analysis_Tool\ImageProcessing\x64\Debug\ImageProcessing.vcxproj.CopyComplete

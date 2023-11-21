@@ -1,0 +1,39 @@
+  CameraSetting.UserControlOfCameraSetting.resources - Embedded, ContainedInManifestFile, 
+ImageRuntimeVersion: v4.0.30319
+Assembly ClassLibrary1, Version=1.0.*, Culture=不因語言而異 (不因國別而異): 
+	hash=SHA1, flags=PublicKey
+Assembly mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089: 
+	hash=None, flags=None
+Assembly System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089: 
+	hash=None, flags=None
+Assembly System, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089: 
+	hash=None, flags=None
+Assembly System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a: 
+	hash=None, flags=None
+Class CameraSetting.ButtonClickEventHandler: AutoLayout, AnsiClass, Class, Public, Sealed
+  :System.MulticastDelegate
+    Void .ctor(System.Object, IntPtr): PrivateScope, Public, HideBySig, SpecialName, RTSpecialName
+  Methods:
+    Invoke(Object): PrivateScope, Public, Virtual, HideBySig, VtableLayoutMask
+    BeginInvoke(Object, AsyncCallback, Object): PrivateScope, Public, Virtual, HideBySig, VtableLayoutMask
+    EndInvoke(IAsyncResult): PrivateScope, Public, Virtual, HideBySig, VtableLayoutMask
+Class CameraSetting.UserControlOfCameraSetting: AutoLayout, AnsiClass, Class, Public, BeforeFieldInit
+  :System.Windows.Forms.UserControl
+    Void .ctor(): PrivateScope, Public, HideBySig, SpecialName, RTSpecialName
+  Fields:
+    System.Windows.Forms.Button button_Test001 : Public
+    System.Windows.Forms.Label label_Exposure : Public
+    System.Windows.Forms.Label label_FPS : Public
+    System.Windows.Forms.Label label_Gain : Public
+    System.Windows.Forms.Label label_FPSValue : Public
+    System.Windows.Forms.Label label_GainValue : Public
+    System.Windows.Forms.Label label_ExposureValue : Public
+    System.Windows.Forms.GroupBox groupBox_CameraImformation : Public
+    System.Windows.Forms.NumericUpDown numericUpDown_Exposure : Public
+    System.Windows.Forms.NumericUpDown numericUpDown_FPS : Public
+    System.Windows.Forms.NumericUpDown numericUpDown_Gain : Public
+  Events:
+    CameraSetting.ButtonClickEventHandler ButtonShotClickEvent: 
+  Methods:
+    add_ButtonShotClickEvent(ButtonClickEventHandler): PrivateScope, Public, HideBySig, SpecialName
+    remove_ButtonShotClickEvent(ButtonClickEventHandler): PrivateScope, Public, HideBySig, SpecialName
