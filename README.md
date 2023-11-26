@@ -1,4 +1,4 @@
-# Digital Image Processing and Analysis Tool
+# Digital Image Processing Tool
 
 # 1. Introduction
 
