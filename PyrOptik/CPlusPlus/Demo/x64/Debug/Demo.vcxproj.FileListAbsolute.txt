@@ -1,0 +1,5 @@
+C:\Users\goodc\OneDrive\Desktop\Git\PyrOptik\CPlusPlus\Demo\x64\Debug\Demo.vcxproj.ResolveComReference.cache
+C:\Users\goodc\OneDrive\Desktop\Git\PyrOptik\CPlusPlus\Demo\x64\Debug\AOI.MainForm.resources
+C:\Users\goodc\OneDrive\Desktop\Git\PyrOptik\CPlusPlus\Demo\x64\Debug\AOI.UI.resources
+C:\Users\goodc\OneDrive\Desktop\Git\PyrOptik\CPlusPlus\Demo\x64\Debug\Demo.vcxproj.GenerateResource.cache
+C:\Users\goodc\OneDrive\Desktop\Git\PyrOptik\CPlusPlus\Demo\x64\Debug\Demo.vcxproj.AssemblyReference.cache
