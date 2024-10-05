@@ -1,0 +1,1360 @@
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.IO;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+using System.Diagnostics;
+
+using Emgu.CV;
+using Emgu.CV.Structure;
+
+namespace ImageProcessing
+{
+    public partial class POD_Cst_Estimation : Form
+    {   //Arrow 二值化是用 適應性，加上Contour 採用List，不用External，避免外輪廓將內輪廓過濾掉
+
+        //Gray bkGrayWhite = new Gray(255);
+        //Image<Rgb, byte> img_InputColor;
+        Image<Gray, byte> m_img_InputGray;
+        //Image<Gray, byte> img_Gray;
+        Image<Gray, byte> m_img_Threshold;
+        Image<Gray, byte> m_img_Canny;
+        Image<Gray, byte> m_img_CannyforContours;
+        Image<Rgb, byte> m_img_Result;
+
+        //Edge
+        string m_directOfEdge;
+
+        //Arrow
+        int m_qtyOfCircle;
+        int m_digitalArrow_Width;
+        int m_digitalArrow_Height;
+        int m_digitalArrow_Offset;
+        int m_digitalRL_Width;
+        int m_digitalRL_Height;
+        int m_digitalRL_OffsetX;
+        int m_digitalRL_OffsetY;
+        Image<Rgb, byte> m_img_HoughCircle;
+
+        //Others
+        readonly Stopwatch m_stopWatch = new Stopwatch();
+        bool m_detailInfoShow = false;
+
+        public POD_Cst_Estimation()
+        {
+            InitializeComponent();
+
+            this.StartPosition = FormStartPosition.Manual;
+
+            //int x = Screen.PrimaryScreen.WorkingArea.Width - this.Width;
+            //int y = (Screen.PrimaryScreen.WorkingArea.Height - this.Height) / 2;
+            //this.Location = new Point(x, y);
+
+            this.Location = new Point(0, 0);
+        }
+
+        #region "ArrowDetect"
+        public string HoughCircleDetect(Image<Gray, byte> img_InputGray,
+                                ref Image<Rgb, byte> img_HoughCircle, int qtyOfCircle, ref List<(Point, int)> circlesInfoByX)//, int houghCircle_Height)
+        {
+            //////Inital
+            int img_SizeX = img_InputGray.Width;
+            int img_SizeY = img_InputGray.Height;
+            Gray bkGrayWhite = new Gray(255);
+            Image<Gray, byte> img_Gray = new Image<Gray, byte>(img_SizeX, img_SizeY, bkGrayWhite);
+            //Processed images
+            img_HoughCircle = new Image<Rgb, byte>(img_SizeX, img_SizeY);
+
+            //////使用高斯濾波去除噪聲
+            CvInvoke.GaussianBlur(img_InputGray, img_Gray, new Size(3, 3), 25);
+
+            //Inital     
+            img_InputGray.Convert<Rgb, Byte>().CopyTo(img_HoughCircle);  //結果圖 包含原圖背景
+            //img_InputGray.CopyTo(img_HoughCircle);
+
+            /////HoughCircle  
+            //CircleF[] circles = CvInvoke.HoughCircles(img_Gray, Emgu.CV.CvEnum.HoughType.Gradient, 1, 270, 30, 70, 100, 150);
+            //Emgu.CV.Util.VectorOfPoint3D32F circles = new Emgu.CV.Util.VectorOfPoint3D32F(); //定義vect儲存圓引數（中心點x、y座標和半徑）
+            Emgu.CV.Util.VectorOfPoint3D32F circles = new Emgu.CV.Util.VectorOfPoint3D32F();
+            if (qtyOfCircle == 1)
+            {
+                CvInvoke.HoughCircles(img_Gray, circles, Emgu.CV.CvEnum.HoughType.Gradient, 1, 270, 30, 70, 100, 150); //#1
+            }
+            else if (qtyOfCircle == 4)
+            {
+                CvInvoke.HoughCircles(img_Gray, circles, Emgu.CV.CvEnum.HoughType.Gradient, 1, 270, 25, 50, 150, 180); //#4
+                //CvInvoke.HoughCircles(img_Gray, circles, Emgu.CV.CvEnum.HoughType.Gradient, 1, 270, 20, 50, 60, 110); //#4
+            }
+
+            //確認 偵測到的圓 影像上的排列順序
+            List<(Point, int)> circlesInfo = new List<(Point, int)>();//定義圓心 半徑
+            for (int i = 0; i < circles.Size; i++)
+            {
+                //引數定義
+                Point center = new Point((int)Math.Round(circles[i].X), (int)Math.Round(circles[i].Y)); //定義圓心
+                int radius = (int)Math.Round(circles[i].Z);
+
+                circlesInfo.Insert(i, (center, radius));
+            }
+            //circlesInfoByX = circlesInfo.OrderBy(p => p.Item1.Y).ToList();
+            //按照 X 及 Y 排序
+            circlesInfoByX = circlesInfo.OrderBy(p => p.Item1.X).ThenBy(p => p.Item1.Y).ToList();
+
+            //畫圓
+            for (int i = 0; i < circlesInfoByX.Count; i++)
+            {
+                //引數定義
+                Point center = circlesInfoByX[i].Item1; //定義圓心
+                int radius = circlesInfoByX[i].Item2;//定義半徑
+                //繪製圓心(圓的thickness設定為-1）
+                CvInvoke.Circle(img_HoughCircle, center, 3, new MCvScalar(255, 0, 255), -1);
+                //繪製圓輪廓
+                CvInvoke.Circle(img_HoughCircle, center, radius, new MCvScalar(255, 0, 255), 3);
+                //標註編號
+                CvInvoke.PutText(img_HoughCircle, Convert.ToString(i), center, Emgu.CV.CvEnum.FontFace.HersheySimplex, 5, new MCvScalar(0, 255, 0), 5);
+            }
+
+            //CvInvoke.Imshow("img_HoughCircle", img_HoughCircle);
+            //this.ImageBox1.Image = img_HoughCircle;
+            return "OK";
+        }
+
+        public string ArrowDetect(Image<Gray, byte> img_InputGray, ref Image<Gray, byte> img_Threshold, int thres, int iterDE,
+                                ref Image<Gray, byte> img_Canny, int cannyThres1, int cannyThres2, int cannySobel,
+                                ref Image<Gray, byte> img_CannyforContours, ref Image<Rgb, byte> img_Result, ref double arrowAngle_Result)
+        {
+            //////Inital
+            int img_SizeX = img_InputGray.Width;
+            int img_SizeY = img_InputGray.Height;
+            Gray bkGrayWhite = new Gray(255);
+            Image<Gray, byte> img_Gray = new Image<Gray, byte>(img_SizeX, img_SizeY, bkGrayWhite);
+            //Processed images
+            img_Threshold = new Image<Gray, byte>(img_SizeX, img_SizeY, bkGrayWhite);
+            img_Canny = new Image<Gray, byte>(img_SizeX, img_SizeY, bkGrayWhite);
+            img_CannyforContours = new Image<Gray, byte>(img_SizeX, img_SizeY, bkGrayWhite);
+            img_Result = new Image<Rgb, byte>(img_SizeX, img_SizeY);
+
+            //////使用高斯濾波去除噪聲
+            CvInvoke.GaussianBlur(img_InputGray, img_Gray, new Size(3, 3), 3);
+
+            //////Threshold            
+            //CvInvoke.Threshold(img_Gray, img_Threshold, thres, 255, Emgu.CV.CvEnum.ThresholdType.Binary);
+            CvInvoke.AdaptiveThreshold(img_Gray, img_Threshold, 255, Emgu.CV.CvEnum.AdaptiveThresholdType.MeanC, Emgu.CV.CvEnum.ThresholdType.Binary, 135, 10);
+            //CvInvoke.Threshold(img_Gray, img_Threshold, decimal.ToDouble(this.numericUpDown_Th.Value), 255, Emgu.CV.CvEnum.ThresholdType.Otsu);
+
+            //////Dilate and Erode
+            Mat element = CvInvoke.GetStructuringElement(Emgu.CV.CvEnum.ElementShape.Rectangle, new Size(3, 3), new Point(-1, -1));
+            //for (int i = 0; i < 5; i++)
+            //{
+            //int iter = decimal.ToInt32(this.NumericUpDown_DilateErode.Value);
+            CvInvoke.Dilate(img_Threshold, img_Threshold, element, new Point(-1, -1), iterDE, Emgu.CV.CvEnum.BorderType.Constant, new MCvScalar(255, 255, 255));
+            CvInvoke.Erode(img_Threshold, img_Threshold, element, new Point(-1, -1), iterDE, Emgu.CV.CvEnum.BorderType.Constant, new MCvScalar(255, 255, 255));
+            //}
+
+            //////Canny            
+            CvInvoke.Canny(img_Threshold, img_Canny, cannyThres1, cannyThres2, cannySobel); // '25, 25 * 2, 3)
+
+            //////Arrow
+            //Inital            
+            img_Canny.CopyTo(img_CannyforContours);
+            img_Gray.Convert<Rgb, Byte>().CopyTo(img_Result);  //結果圖 包含原圖背景
+            var contours = new Emgu.CV.Util.VectorOfVectorOfPoint();
+            Mat hierarchy = new Mat();
+
+            //FindContours
+            CvInvoke.FindContours(img_CannyforContours, contours, hierarchy, Emgu.CV.CvEnum.RetrType.External, Emgu.CV.CvEnum.ChainApproxMethod.ChainApproxNone); //External
+
+            //FindContours 確認是否有找到
+            if (contours.Size == 0)
+            {
+                string str_t = "NG, 沒有FindContours!";
+                //UI_RichTextBox_SystemLog_Text(str);
+                //Console.WriteLine(str_t);
+                return str_t;
+            }
+
+            int nearestSection = 99999;
+            Point nearestCenter = new Point(99999, 99999);
+            Point nearestGravity = new Point(99999, 99999);
+            double nearestDist = 99999;
+
+            for (int i = 0; i < contours.Size; i++) // 有幾個section
+            {
+                double contourSumX = 0;
+                double contourSumY = 0;
+
+                //計算連通輪廓的面積Area
+                double contourarea = CvInvoke.ContourArea(contours[i]);
+                //計算連通輪廓的長度
+                double contourLength = CvInvoke.ArcLength(contours[i], false);
+
+                //計算當前輪廓的Chaincode 的總和 及 中心
+                for (int j = 0; j < contours[i].Size; j++)//每個section的資料
+                {
+                    contourSumX += contours[i][j].X;
+                    contourSumY += contours[i][j].Y;
+                    //if (i == 17)
+                    //{ Console.WriteLine("contour[" + i + "][" + j + "].X=" + contours[i][j].X + ", contour[" + i + "][" + j + "].Y=" + contours[i][j].Y); }
+                }
+                double contourCenterX = (double)contourSumX / contours[i].Size;
+                double contourCenterY = (double)contourSumY / contours[i].Size;
+
+                //計算當前輪廓的矩
+                Moments moments = new Moments();
+                moments = CvInvoke.Moments(contours[i], false);
+                double m00 = moments.M00;
+                double m01 = moments.M01;
+                double m10 = moments.M10;
+                double contourGravityX;
+                double contourGravityY;
+                if (m00 > 0)
+                {
+                    contourGravityX = m10 / m00;//计算当前轮廓中心点坐标
+                    contourGravityY = m01 / m00;
+                }
+                else { contourGravityX = 9999; contourGravityY = 9999; }
+
+                //輸出
+                string str_t = "Section = " + i + ", Size = " + string.Format("{0:#####0}", contours[i].Size) +
+                    ", Area = " + String.Format("{0:#####0}", contourarea) + ", Length = " + String.Format("{0:#####0}", contourLength) +
+                    ", ContourCenter = (" + string.Format("{0:#####0.00}", contourCenterX) + ", " + string.Format("{0:#####0.00}", contourCenterY) + ")" +
+                    ", Gravity = (" + string.Format("{0:#####0.00}", contourGravityX) + ", " + string.Format("{0:#####0.00}", contourGravityY) + ")";// +
+                                                                                                                                                     //", Vsum(Cou2G) = (" + string.Format("{0:#####0.0000}", contourVectorsumX) + ", " + string.Format("{0:#####0.0000}", contourVectorsumY) + ")" + ", Angle(Cou2G) = " + string.Format("{0:#####0.00}", angleCou2G) ;
+                if (this.m_detailInfoShow) //細節是否呈現出來
+                {
+                    UI_RichTextBox_SystemLog_Text(str_t);
+                    Console.WriteLine(str_t);
+                }
+
+                //畫圖 畫每個contours
+                CvInvoke.DrawContours(img_Result, contours, i, new MCvScalar(((i + 1) % 3) * 255, ((i + 2) % 3) * 255, ((i + 3) % 3) * 255), 1, Emgu.CV.CvEnum.LineType.EightConnected, hierarchy, 2147483647);
+                //標註每個contours Section標號
+                CvInvoke.PutText(img_Result, Convert.ToString(i), new Point((int)contourCenterX, (int)contourCenterY),
+                    Emgu.CV.CvEnum.FontFace.HersheySimplex, 0.5, new MCvScalar(((i + 1) % 3) * 255, ((i + 2) % 3) * 255, ((i + 3) % 3) * 255), 1);
+
+                /////過濾
+                //算出哪個contour之contourCenter 離 影像中心 比較近
+                double dist = Math.Sqrt(Math.Pow(contourCenterX - (img_SizeX / 2), 2) + Math.Pow(contourCenterY - (img_SizeY / 2), 2));
+                if (dist < nearestDist && contourLength > 100)
+                {
+                    nearestDist = dist;
+                    nearestSection = i;
+                    nearestCenter.X = (int)contourCenterX;
+                    nearestCenter.Y = (int)contourCenterY;
+                    nearestGravity.X = (int)contourGravityX;
+                    nearestGravity.Y = (int)contourGravityY;
+                }
+            }
+            if (nearestSection == 99999)
+            {
+                return "NG, 沒有相近點!";
+            }
+            //UI_RichTextBox_SystemLog_Text("-------------------");
+
+            //畫最中間的contour 之 中心點 nearestCenter
+            //Point nearestCenter = new Point((int)nearestCenterX, (int)nearestCenterY);
+            CvInvoke.Line(img_Result, nearestCenter, nearestCenter, new MCvScalar(255, 0, 0, 0), 2);
+            //CvInvoke.PutText(img_Result, "nearestCenter", nearestCenter, Emgu.CV.CvEnum.FontFace.HersheySimplex, 0.5, new MCvScalar(255, 0, 0, 0), 1);
+            //畫最中間的contour 之 中心點 nearestGravity
+            //Point nearestGravity = new Point((int)nearestGravityX, (int)nearestGravityY);
+            CvInvoke.Line(img_Result, nearestGravity, nearestGravity, new MCvScalar(0, 255, 0, 0), 2);
+            //CvInvoke.PutText(img_Result, "nearestGravity", nearestGravity, Emgu.CV.CvEnum.FontFace.HersheySimplex, 0.5, new MCvScalar(0, 255, 0, 0), 1);
+
+            //畫影像中心的點
+            Point ImgCenter = new Point((int)(img_SizeX / 2), (int)(img_SizeY / 2));
+            CvInvoke.Line(img_Result, ImgCenter, ImgCenter, new MCvScalar(0, 0, 0, 0), 2);
+            //CvInvoke.PutText(img_Result, "imgCenter", ImgCenter, Emgu.CV.CvEnum.FontFace.HersheySimplex, 0.5, new MCvScalar(0, 0, 255, 0), 1);
+
+            //畫最中間的contour 之 填充 帶角度的矩形
+            RotatedRect rec = CvInvoke.FitEllipse(contours[nearestSection]);
+            //CvInvoke.Ellipse(img_Result, ellipse, (255, 0, 255), 2);
+            Point RotatedRectCenter = new Point((int)rec.Center.X, (int)rec.Center.Y);
+            CvInvoke.Polylines(img_Result, Array.ConvertAll(rec.GetVertices(), System.Drawing.Point.Round), true, new MCvScalar(255, 255, 255, 0), 1);//僅繪製輪廓線
+            CvInvoke.Line(img_Result, RotatedRectCenter, RotatedRectCenter, new MCvScalar(255, 255, 255, 0), 2);//畫中心
+
+            //依recAngle方向 將範圍定義到 0 ~180 degree
+            double recAngle = 0;
+            if (rec.Angle > 90)
+            {
+                recAngle = 270 - rec.Angle;
+            }
+            else
+            {
+                recAngle = 90 - rec.Angle;
+            }
+
+            //凸包
+            Point[][] con1 = contours.ToArrayOfArray();
+            PointF[][] con2 = Array.ConvertAll<Point[], PointF[]>(con1, new Converter<Point[], PointF[]>(PointToPointF));
+            //凸包 找出凸點
+            PointF[] hull = CvInvoke.ConvexHull(con2[nearestSection], true);
+            for (int j = 0; j < hull.Length; j++)
+            {
+                Point p1 = new Point((int)(hull[j].X + 0.5), (int)(hull[j].Y + 0.5));
+                Point p2;
+                if (j == hull.Length - 1)
+                    p2 = new Point((int)(hull[0].X + 0.5), (int)(hull[0].Y + 0.5));
+                else
+                    p2 = new Point((int)(hull[j + 1].X + 0.5), (int)(hull[j + 1].Y + 0.5));
+                //CvInvoke.Circle(img_Result, p1, 3, new MCvScalar(0, 0, 0, 0), 1);
+                //CvInvoke.Line(img_Result, p1, p2, new MCvScalar(0, 0, 0, 0), 1);
+                CvInvoke.Line(img_Result, p1, p1, new MCvScalar(0, 0, 0, 0), 2);//畫中心
+            }
+
+            //輸入 矩形角度recAngle 計算 與 凸點跟nearestCenter 的離散程度，並判斷箭頭是否要轉向  nearestGravity若contour破口會有偏差
+            double ArrowAngle = ArrowAngleCheck(recAngle, nearestCenter, hull);
+
+            //畫箭頭方向
+            double drawArrowLength = Math.Sqrt(Math.Pow(rec.Size.Width, 2) + Math.Pow(rec.Size.Height, 2)) / 3.0;
+            Point arrowP = new Point(nearestCenter.X + (int)(drawArrowLength * Math.Cos(ArrowAngle * Math.PI / 180)), nearestCenter.Y - (int)(drawArrowLength * Math.Sin(ArrowAngle * Math.PI / 180)));// Y負號主要是直角座標轉影像座標
+            CvInvoke.ArrowedLine(img_Result, nearestCenter, arrowP, new MCvScalar(255, 255, 255), 2, Emgu.CV.CvEnum.LineType.EightConnected, 0, 0.1);
+
+            //輸出
+            string str2 = "NearestSection =" + nearestSection + ", NearestCenter = (" + string.Format("{0:#####0.00}", nearestCenter.X) + ", " + string.Format("{0:#####0.00}", nearestCenter.Y) + ")" +
+                ", RotatedRectCenter = (" + string.Format("{0:#####0.00}", RotatedRectCenter.X) + ", " + string.Format("{0:#####0.00}", RotatedRectCenter.Y) + ")" +
+                ", RecWidth = " + string.Format("{0:#####0.00}", rec.Size.Width) + ", RecHeight = " + string.Format("{0:#####0.00}", rec.Size.Height) + ", RecAngle(0~180) = " + string.Format("{0:#####0.00}", recAngle) +
+                ", Arrow Angle = " + string.Format("{0:#####0.00}", ArrowAngle);
+
+            if (this.m_detailInfoShow) //細節是否呈現出來
+            {
+                UI_RichTextBox_SystemLog_Text(str2);
+                Console.WriteLine(str2);
+            }
+
+            //輸出結果
+            arrowAngle_Result = ArrowAngle;
+
+            return "OK";//, Qty of Edge(" + directOfline + ")= " + count_FinalContours;
+        }
+
+        public double CalAngleTwoPoint(Point basePoint, Point directPoint)
+        {
+            double deltaX = directPoint.X - basePoint.X;
+            double deltaY = -(directPoint.Y - basePoint.Y);//1.負號 直角坐標與影像座標的Y方向不一樣 
+            double angle = 0.0;
+
+            //計算四象限方向角 0~360度
+            if (deltaX == 0)
+            {
+                if (deltaY > 0)
+                {
+                    angle = Math.PI / 2.0;     //90度                
+                }
+                else if (deltaY < 0)
+                {
+                    angle = 3.0 * Math.PI / 2.0;  //270度
+                }
+                else
+                {
+                    angle = 0;
+                }
+            }
+            else
+            {
+                double jiao = Math.Abs​​(deltaY / deltaX);
+                // 四個象限，四種不同的情況
+                if (deltaX > 0 && deltaY > 0)
+                {
+                    angle = Math.Atan(jiao);
+                }
+                if (deltaX < 0 && deltaY > 0)
+                {
+                    angle = Math.PI - Math.Atan(jiao); // 2 * Math.PI - Math.Atan(jiao);
+                }
+                if (deltaX < 0 && deltaY < 0)
+                {
+                    angle = Math.PI + Math.Atan(jiao); //Math.Atan(jiao) + Math.PI;
+                }
+                if (deltaX > 0 && deltaY < 0)
+                {
+                    angle = 2.0 * Math.PI - Math.Atan(jiao);
+                }
+            }
+            angle = angle * 180 / Math.PI; // 弧度轉角度
+
+            //if (angle > 180)  //從 0~360 轉回 0~180
+            //{ 
+            //    angle = angle - 180; 
+            //}
+
+            return angle;
+
+            #region "test"
+            //if (deltaX == 0)
+            //{
+            //    angle = Math.PI / 2.0;
+            //    if (deltaX == 0)
+            //    {
+            //        if (basePoint.Y == directPoint.Y)
+            //        {
+            //            angle = 0.0;
+            //        }
+            //        else if (basePoint.Y < directPoint.Y)
+            //        {
+            //            angle = 3.0 * Math.PI / 2.0;
+            //        }
+            //    } 
+            //}
+            //else if (deltaX > 0 && deltaY > 0)
+            //{
+            //    angle = Math.PI / 2.0 + Math.Atan(-deltaY / deltaX);
+            //    //angle = Math.Atan(deltaX / deltaY);
+            //    angle = angle * (180 / Math.PI);
+            //}
+            //else if (deltaX > 0 && deltaY < 0)
+            //{
+            //    angle = Math.Atan(deltaY / deltaX);
+            //    //angle = Math.PI / 2.0 + Math.Atan(-deltaY / deltaX);
+            //    angle = angle * (180 / Math.PI);
+            //}
+            //else if (deltaX < 0 && deltaY < 0)
+            //{
+            //    angle = 3.0 * Math.PI / 2.0 + Math.Atan(deltaY / -deltaX);
+            //    //angle = Math.PI + Math.Atan(deltaX / deltaY);
+            //    angle = angle * (180 / Math.PI);
+            //}
+            //else if (deltaX < 0 && deltaY > 0)
+            //{
+            //    angle = Math.PI + Math.Atan(deltaY / deltaX);
+            //    //angle = 3.0 * Math.PI / 2.0 + Math.Atan(deltaY / -deltaX);
+            //    angle = angle * (180 / Math.PI);
+            //}
+
+            //if (angle > 180)
+            //{ angle = angle - 180; }
+
+            //angle = angle * (180 / Math.PI);
+
+            #endregion                                  
+        }
+        public double ArrowAngleCheck(double recAngle, Point basePoint, PointF[] hullPoint)
+        {
+            double currentVecSum = 0;
+            double oppositeVecSum = 0;
+            double finalAngle;
+            int countCurrentVecSum = 0;
+            int countOppositeVecSum = 0;
+
+            //確認每個點與basePoint 的方向性
+            for (int j = 0; j < hullPoint.Length; j++)
+            {
+                Point p1 = new Point((int)(hullPoint[j].X + 0.5), (int)(hullPoint[j].Y + 0.5));
+                double tempAngle = CalAngleTwoPoint(basePoint, p1); //每個點予基準點的夾角 正X方向，逆時針
+                double tempDist = Math.Sqrt(Math.Pow(p1.X - basePoint.X, 2) + Math.Pow(p1.Y - basePoint.Y, 2));
+                double tempAngleA = tempAngle - recAngle;
+                if (Math.Abs(tempAngleA) < 45) //在正負45度內的點才計算
+                {
+                    currentVecSum += tempDist * (Math.Abs(Math.Sin(tempAngleA * Math.PI / 180)));// + Math.Abs(Math.Cos(tempAngleA * Math.PI / 180)));
+                    countCurrentVecSum += 1;
+                }
+                else if (Math.Abs(tempAngleA - 180) < 45)
+                {
+                    oppositeVecSum += tempDist * (Math.Abs(Math.Sin(tempAngleA * Math.PI / 180)));// + Math.Abs(Math.Cos(tempAngleA * Math.PI / 180)));
+                    countOppositeVecSum += 1;
+                }
+            }
+            //看哪個離散程度比較大 
+            if (currentVecSum / countCurrentVecSum > oppositeVecSum / countOppositeVecSum)
+            {
+                finalAngle = recAngle;
+            }
+            else
+            {
+                //原角度 範圍定義 0~180 ，加180 範圍到 0~360
+                finalAngle = 180 + recAngle;
+            }
+
+            if (this.m_detailInfoShow) //細節是否呈現出來
+            {
+                string str = "(ArrowAngleCheck) currentVecSum =" + string.Format("{0:#####0.00}", currentVecSum) + ", oppositeVecSum =" + string.Format("{0:#####0.00}", oppositeVecSum) + ", recAngle =" + string.Format("{0:#####0.00}", recAngle);
+                UI_RichTextBox_SystemLog_Text(str);
+                str = "(ArrowAngleCheck) countCurrentVecSum =" + string.Format("{0:#####0.00}", countCurrentVecSum) + ", countOppositeVecSum =" + string.Format("{0:#####0.00}", countOppositeVecSum);
+                UI_RichTextBox_SystemLog_Text(str);
+                str = "(ArrowAngleCheck) Current sum/Count =" + string.Format("{0:#####0.00}", currentVecSum / countCurrentVecSum) + ", opposite sum/Count =" + string.Format("{0:#####0.00}", oppositeVecSum / countOppositeVecSum);
+                UI_RichTextBox_SystemLog_Text(str);
+            }
+            return finalAngle;
+        }
+        public static PointF[] PointToPointF(Point[] pf)
+        {
+            PointF[] aaa = new PointF[pf.Length];
+            int num = 0;
+            foreach (var point in pf)
+            {
+                aaa[num].X = (int)point.X;
+                aaa[num++].Y = (int)point.Y;
+            }
+            return aaa;
+        }
+
+        //public void GetDigitalImage(Image<Gray, byte> img_InputGray, ref Emgu.CV.Util.VectorOfPoint3D32F circles, int offsetFromCenter, double arrow_Angle, int digitalImaga_Width, int digitalImaga_Height)
+        //{
+        //    //////Inital
+        //    int img_SizeX = img_InputGray.Width;
+        //    int img_SizeY = img_InputGray.Height;
+        //    Gray bkGrayWhite = new Gray(255);
+        //    Image<Gray, byte> img_Gray = new Image<Gray, byte>(img_SizeX, img_SizeY, bkGrayWhite);
+        //    //Processed images
+
+        //    //割比較大的圖
+        //    int padding = 10;
+        //    Rectangle rectangle = new Rectangle(center.X - radius - padding, center.Y - radius - padding, 2 * (radius + padding), 2 * (radius + padding));
+
+        //    Image<Gray, byte> subImage = new Image<Gray, byte>(m_img_InputGray.Size.Width, m_img_InputGray.Size.Height);
+        //    Image<Gray, byte> cropImage = new Image<Gray, byte>(2 * (radius + padding), 2 * (radius + padding));
+
+        //    //旋轉
+
+        //}
+        #endregion
+
+        #region "EdgeDetect"
+        public string EdgeDetect(Image<Gray, byte> img_InputGray, ref Image<Gray, byte> img_Threshold, int thres, int iterDE,
+                                ref Image<Gray, byte> img_Canny, int cannyThres1, int cannyThres2, int cannySobel,
+                                ref Image<Gray, byte> img_CannyforContours, ref Image<Rgb, byte> img_Result, string directOfline, int filterbyMinSize,
+                                ref List<Point> edge_result)
+        {
+            //////Inital
+            int img_SizeX = img_InputGray.Width;
+            int img_SizeY = img_InputGray.Height;
+            Gray bkGrayWhite = new Gray(255);
+            Image<Gray, byte> img_Gray = new Image<Gray, byte>(img_SizeX, img_SizeY, bkGrayWhite);
+            //Processed images
+            img_Threshold = new Image<Gray, byte>(img_SizeX, img_SizeY, bkGrayWhite);
+            img_Canny = new Image<Gray, byte>(img_SizeX, img_SizeY, bkGrayWhite);
+            img_CannyforContours = new Image<Gray, byte>(img_SizeX, img_SizeY, bkGrayWhite);
+            img_Result = new Image<Rgb, byte>(img_SizeX, img_SizeY);
+
+            //////使用高斯濾波去除噪聲
+            ///
+            CvInvoke.GaussianBlur(img_InputGray, img_Gray, new Size(3, 3), 3);
+            //img_Gray._GammaCorrect(3);
+            //img_Gray._EqualizeHist();
+
+            //////Threshold            
+            CvInvoke.Threshold(img_Gray, img_Threshold, thres, 255, Emgu.CV.CvEnum.ThresholdType.Binary);
+            //CvInvoke.AdaptiveThreshold(img_Gray, img_Threshold, 255, Emgu.CV.CvEnum.AdaptiveThresholdType.MeanC, Emgu.CV.CvEnum.ThresholdType.Binary, 135, 10);
+            //CvInvoke.Threshold(img_Gray, img_Threshold, decimal.ToDouble(this.numericUpDown_Th.Value), 255, Emgu.CV.CvEnum.ThresholdType.Otsu);
+
+            //////Dilate and Erode
+            Mat element = CvInvoke.GetStructuringElement(Emgu.CV.CvEnum.ElementShape.Rectangle, new Size(3, 3), new Point(-1, -1));
+            //for (int i = 0; i < 5; i++)
+            //{
+            //int iter = decimal.ToInt32(this.NumericUpDown_DilateErode.Value);
+            CvInvoke.Dilate(img_Threshold, img_Threshold, element, new Point(-1, -1), iterDE, Emgu.CV.CvEnum.BorderType.Constant, new MCvScalar(255, 255, 255));
+            CvInvoke.Erode(img_Threshold, img_Threshold, element, new Point(-1, -1), iterDE, Emgu.CV.CvEnum.BorderType.Constant, new MCvScalar(255, 255, 255));
+            //}
+
+            //////Canny            
+            CvInvoke.Canny(img_Threshold, img_Canny, cannyThres1, cannyThres2, cannySobel); // '25, 25 * 2, 3)
+
+            #region "HoughLines"
+            /////////////////Hough intial
+            //img_Result = new Image<Rgb, byte>(this.img_SizeX, this.img_SizeY);
+            //img_Result = img_Gray.Convert<Rgb, Byte>();
+            //LineSegment2D[] lines;
+
+            ////HoughLinesP #1
+            ////LineSegment2D[][] liness = img_Canny.HoughLinesBinary(1, Math.PI / 180, decimal.ToInt32(this.NumericUpDown_HoughLinesTh.Value), decimal.ToDouble(this.NumericUpDown_HoughLinesLength.Value), decimal.ToDouble(this.NumericUpDown_HoughLinesGap.Value));
+            ////lines = liness[0];
+
+            ////HoughLines #1
+            //lines = CvInvoke.HoughLinesP(img_Canny, 1, Math.PI / 180, decimal.ToInt32(this.NumericUpDown_HoughLinesTh.Value), decimal.ToDouble(this.NumericUpDown_HoughLinesLength.Value), decimal.ToDouble(this.NumericUpDown_HoughLinesGap.Value));
+
+            ////HoughLines #2
+            //////img_Canny.CopyTo(img_CannyforContours_HoughLines);
+            ////Emgu.CV.Util.VectorOfPointF vectorlines = new Emgu.CV.Util.VectorOfPointF(); //定義一個矢量結構lines，等價於opencv中的vector<Vec2f>
+            ////CvInvoke.HoughLines(img_Canny, vectorlines, 1, Math.PI / 180, decimal.ToInt32(this.NumericUpDown_HoughLinesTh.Value), 0, 0);
+
+            ////var linesList = new List<LineSegment2D>();
+            //////依次在圖中繪製出每條線段
+            ////for (int k = 0; k < vectorlines.Size; k++)
+            ////{
+            ////    PointF p = vectorlines[k];
+            ////    float rho = p.X; //原點到直線的距離
+            ////    float theta = p.Y; //直線的角度
+
+            ////    double a = Math.Cos(theta), b = Math.Sin(theta);
+            ////    double x0 = rho * a, y0 = rho * b;
+
+            ////    Point pt1 = new Point(), pt2 = new Point();
+            ////    pt1.X = (int)Math.Round(x0 - 1000 * b);
+            ////    pt1.Y = (int)Math.Round(y0 + 1000 * a);
+            ////    pt2.X = (int)Math.Round(x0 + 1000 * b);
+            ////    pt2.Y = (int)Math.Round(y0 - 1000 * a);
+
+            ////    //CvInvoke.Line(img_HoughLines, pt1, pt2, new MCvScalar(0, 255, 0), 1, Emgu.CV.CvEnum.LineType.EightConnected); //LineType.AntiAlias表示抗鋸齒 
+            ////    linesList.Add(new LineSegment2D(pt1, pt2));
+            ////}
+            ////lines = linesList.ToArray();
+
+            //if (lines.Length == 0)
+            //{
+            //    UI_RichTextBox_SystemLog_Text("沒有HoughLines!");
+            //}
+            //else
+            //{
+            //    UI_RichTextBox_SystemLog_Text("HoughLines有 " + lines.Length);
+            //}
+
+            //foreach (LineSegment2D line in lines)
+            //{
+            //    img_Result.Draw(line, new Rgb(Color.HotPink), 1);
+            //    UI_RichTextBox_SystemLog_Text("中心點 Meam_sumX = " + (line.P1.X + line.P2.X) / 2 + ", Meam_sumY = " + (line.P1.Y + line.P2.Y) / 2);
+            //}
+            //ImageBox1.Image = img_Result;
+            #endregion
+
+            #region "Contours"
+            //////Contours 
+            //Inital            
+            img_Canny.CopyTo(img_CannyforContours);
+            img_Gray.Convert<Rgb, Byte>().CopyTo(img_Result);  //結果圖 包含原圖背景
+            var contours = new Emgu.CV.Util.VectorOfVectorOfPoint();
+            Mat hierarchy = new Mat();
+
+            //FindContours
+            CvInvoke.FindContours(img_CannyforContours, contours, hierarchy, Emgu.CV.CvEnum.RetrType.External, Emgu.CV.CvEnum.ChainApproxMethod.ChainApproxNone);
+            //FindContours 確認是否有找到
+            if (contours.Size == 0)
+            {
+                string str = "NG";//( + directOfline + ") 沒有FindContours!";
+                //UI_RichTextBox_SystemLog_Text(str);
+                //Console.WriteLine(str);
+                return str;
+            }
+            //處理並計算 Contours 資料
+            for (int i = 0; i < contours.Size; i++) // 有幾個section
+            {
+                long sumX = 0;
+                long sumY = 0;
+
+                //取得面積大小
+                double area = CvInvoke.ContourArea(contours[i]);
+                int size = 0;
+
+                if (directOfline == "H")
+                {
+                    size = img_SizeX;
+                }
+                else if (directOfline == "V")
+                {
+                    size = img_SizeY;
+                }
+
+                Point contourP;
+                if (contours[i].Size > ((double)filterbyMinSize / 100 * size) * 2)  //取得比較長的Chaincode
+                {
+                    //Chaincode
+                    for (int j = 0; j < contours[i].Size; j++)//每個section的資料
+                    {
+                        sumX += contours[i][j].X;
+                        sumY += contours[i][j].Y;
+
+                        //Console.WriteLine("contour[" + i + "][" + j + "].X=" + contours[i][j].X + ", contour[" + i + "][" + j + "].Y=" + contours[i][j].Y);
+                    }
+                    if (this.m_detailInfoShow) //細節是否呈現出來
+                    {
+                        string str = "Section:" + i + ", length = " + decimal.ToInt32(contours[i].Size / 2) + ", area = " + area + ", Meam_X = " + (sumX / contours[i].Size) + ", Meam_Y = " + (sumY / contours[i].Size);
+                        UI_RichTextBox_SystemLog_Text(str);
+                        Console.WriteLine(str);
+                    }
+
+                    //畫圖
+                    CvInvoke.DrawContours(img_Result, contours, i, new MCvScalar(((i + 1) % 3) * 255, ((i + 2) % 3) * 255, ((i + 3) % 3) * 255), 1, Emgu.CV.CvEnum.LineType.EightConnected, hierarchy, 2147483647);
+                    contourP = new Point((int)(sumX / contours[i].Size), (int)(sumY / contours[i].Size));
+
+                    //輸出結果
+                    edge_result.Add(contourP);
+                }
+            }
+
+            return "OK";
+
+            #endregion
+
+            #region "Test"
+            //img_CannyforContours = new Image<Gray, byte>(this.img_SizeX, this.img_SizeY, bkGrayWhite);
+            //img_Canny.CopyTo(img_CannyforContours);
+
+            //var contours = new Emgu.CV.Util.VectorOfVectorOfPoint();
+            //Mat hierarchy = new Mat();
+            //CvInvoke.FindContours(img_CannyforContours, contours, hierarchy, Emgu.CV.CvEnum.RetrType.List, Emgu.CV.CvEnum.ChainApproxMethod.ChainApproxNone);
+            //long sumX = 0;
+            //long sumY = 0;
+            //if (contours.Size == 0) { UI_RichTextBox_SystemLog_Text("沒有FindContours!"); }
+            //for (int i = 0; i < contours.Size; i++) // section
+            //{
+
+            //// ''''''''''''''找大面積的
+            //int areaMax = img_SizeX * img_SizeY;
+            //double area = CvInvoke.ContourArea(contours[i]);
+            //// 篩選輪廓面積大於三分之一整體圖片面積的輪廓
+            //if (area < decimal.ToDouble(this.numericUpDown_FilterArea.Value))//if (area < areaMax / 30000)
+            //{
+            //    continue;
+            //}
+
+            //UI_RichTextBox_SystemLog_Text("(面積大於" + decimal.ToDouble(this.numericUpDown_FilterArea.Value) +"有 Section:" + i + ", area = " + area);
+
+            ////畫在原始影像上
+            //if (this.RadioButton_Color.Checked)
+            //{
+            //    CvInvoke.DrawContours(img_Color, contours, i, new MCvScalar(0, 0, 0), 1, Emgu.CV.CvEnum.LineType.EightConnected, hierarchy, 2147483647);
+            //}
+            //else if (this.RadioButton_Gray.Checked)
+            //{
+            //    CvInvoke.DrawContours(img_Gray, contours, i, new MCvScalar(0, 0, 0), 1, Emgu.CV.CvEnum.LineType.EightConnected, hierarchy, 2147483647);
+            //}
+            //畫輪廓圖上
+            //CvInvoke.DrawContours(img_CannyforContours, contours, i, new MCvScalar(0, 0, 0), 1, Emgu.CV.CvEnum.LineType.EightConnected, hierarchy, 2147483647);
+
+            ////Chaincode
+            //for (int j = 0; j < contours[i].Size; j++)
+            //{
+            //    sumX += contours[i][j].X;
+            //    sumY += contours[i][j].Y;
+            //    if (i == 0)
+            //    {
+            //        //UI_RichTextBox_SystemLog_Text("X = " + contours[i][j].X + ", Y = " + contours[i][j].Y + ", sumX = " + sumX + ", sumY = " + sumY); 
+            //    }
+
+            //}
+            //UI_RichTextBox_SystemLog_Text("Meam_sumX = " + (sumX / contours[i].Size) + ", Meam_sumY = " + (sumY / contours[i].Size));
+
+            //    sumX = 0;
+            //    sumY = 0;
+            //    System.Threading.Thread.Sleep(0);
+            //    Application.DoEvents();
+            //    //MessageBox.Show("this ,next!");
+            //}
+
+            //UI_RichTextBox_SystemLog_Text("sumX = " + sumX.ToString() + ", sumY = " + sumY.ToString());
+
+            // ''''''''''''''找大面積的
+            // Dim areaMax As Integer = img.Width * img.Height
+            // For i = 0 To contours.Size - 1
+            // Dim area As Integer = CvInvoke.ContourArea(contours(i))
+
+            // '筛选轮廓面积大于三分之一整体图片面积的轮廓
+            // If area <areaMax / 3 Then
+            // Continue For
+            // End If
+            // CvInvoke.DrawContours(imgresult, contours, i, New MCvScalar(0, 0, 0), 2, CvEnum.LineType.EightConnected, hierarchy, 2147483647)
+            // Next
+
+            // imgresult.Save("R:\Edge_1_result.bmp")
+            #endregion
+
+        }
+        #endregion
+
+        private void ImageProcess()
+        {
+            m_stopWatch.Reset();
+            m_stopWatch.Start();
+            //////Edge
+            if (this.RadioButton_EdgeFun.Checked)
+            {
+                //EdgeDetect
+                List<Point> edge_result = new List<Point>();
+                string str = this.EdgeDetect(this.m_img_InputGray, ref this.m_img_Threshold, decimal.ToInt32(this.numericUpDown_Thres.Value), decimal.ToInt32(this.NumericUpDown_DilateErode.Value),
+                    ref this.m_img_Canny, decimal.ToInt32(this.NumericUpDown_CannyTh1.Value), decimal.ToInt32(this.NumericUpDown_CannyTh2.Value), decimal.ToInt32(this.NumericUpDown_CannySobel.Value),
+                    ref this.m_img_CannyforContours, ref this.m_img_Result, this.m_directOfEdge, decimal.ToInt32(this.NumericUpDown_EdgeFilterbyMinSize.Value), ref edge_result);
+                UI_RichTextBox_SystemLog_Text("---------------------------------------------");
+                UI_RichTextBox_SystemLog_Text("EdgeDetect Done! " + str);
+
+                if (edge_result.Count == 0)
+                {
+                    str = "NG, Qty of Edge(" + this.m_directOfEdge + ")= " + edge_result.Count;
+                    UI_RichTextBox_SystemLog_Text("EdgeDetect Result! " + str);
+                }
+                else
+                {
+                    str = "OK, Qty of Edge(" + this.m_directOfEdge + ")= " + edge_result.Count;
+                    UI_RichTextBox_SystemLog_Text("EdgeDetect Result! " + str);
+
+                    for (int i = 0; i < edge_result.Count; i++)
+                    {
+                        str = "    Edge Postion(" + i + ") = ( " + edge_result[i].X + ", " + edge_result[i].Y + ")";
+                        UI_RichTextBox_SystemLog_Text(str);
+                    }
+                }
+            }
+
+            //////Arrow
+            if (this.RadioButton_ArrowFun.Checked)
+            {
+                //先做Hough
+                //Emgu.CV.Util.VectorOfPoint3D32F circles = new Emgu.CV.Util.VectorOfPoint3D32F();
+                List<(Point, int)> circlesInfo = new List<(Point, int)>();//定義圓心 半徑
+                string str = this.HoughCircleDetect(this.m_img_InputGray, ref this.m_img_HoughCircle, this.m_qtyOfCircle, ref circlesInfo);
+                UI_RichTextBox_SystemLog_Text("CircleDetect Done! " + str);
+
+                if (circlesInfo.Count == 0)
+                {
+                    str = "NG, Qty of Circle= " + circlesInfo.Count;
+                    UI_RichTextBox_SystemLog_Text("CircleDetect Result! " + str);
+                }
+                else
+                {
+                    str = "OK, Qty of Circle= " + circlesInfo.Count;
+                    UI_RichTextBox_SystemLog_Text("CircleDetect Result! " + str);
+
+                    for (int i = 0; i < circlesInfo.Count; i++)
+                    {
+                        //將每個圓都去看箭頭方向
+                        //引數定義
+                        Point center = circlesInfo[i].Item1; //定義圓心
+                        int radius = circlesInfo[i].Item2; //定義半徑
+                        int padding;
+                        Rectangle recROI;
+                        Image<Gray, byte> subImage; //裁切的暫存圖
+                        Image<Gray, byte> cropImage; //裁切後的圖
+                        Image<Gray, byte> rotateImage; //旋轉後的圖
+                        Image<Gray, byte> digitalArrowImage; //數字的圖
+                        Image<Gray, byte> digitalRImage; //數字的圖
+                        Image<Gray, byte> digitalLImage; //數字的圖
+
+                        int digitalArrowOffset = this.m_digitalArrow_Offset;
+                        int digitalRLOffsetX = this.m_digitalRL_OffsetX;
+                        int digitalRLOffsetY = this.m_digitalRL_OffsetY;
+
+                        //割圖 padding取一些Buffer
+                        padding = -5;
+                        subImage = new Image<Gray, byte>(this.m_img_InputGray.Size.Width, this.m_img_InputGray.Size.Height);
+                        recROI = new Rectangle(center.X - radius - padding, center.Y - radius - padding, 2 * (radius + padding), 2 * (radius + padding));
+                        cropImage = new Image<Gray, byte>(2 * (radius + padding), 2 * (radius + padding));
+                        this.m_img_InputGray.CopyTo(subImage);
+                        CvInvoke.cvSetImageROI(subImage.Ptr, recROI);
+                        CvInvoke.cvCopy(subImage.Ptr, cropImage, IntPtr.Zero);
+
+                        //ArrowDetect      this.m_img_InputGray 改成 cropImage
+                        double arrowAngle_Result = -999;
+                        string str_1 = this.ArrowDetect(cropImage, ref this.m_img_Threshold, decimal.ToInt32(this.numericUpDown_Thres.Value), decimal.ToInt32(this.NumericUpDown_DilateErode.Value),
+                                ref this.m_img_Canny, decimal.ToInt32(this.NumericUpDown_CannyTh1.Value), decimal.ToInt32(this.NumericUpDown_CannyTh2.Value), decimal.ToInt32(this.NumericUpDown_CannySobel.Value),
+                                ref this.m_img_CannyforContours, ref this.m_img_Result, ref arrowAngle_Result);
+                        UI_RichTextBox_SystemLog_Text("---------------------------------------------");
+                        UI_RichTextBox_SystemLog_Text("ArrowDetect Done! " + str_1);
+
+                        //////////
+                        if (arrowAngle_Result < 0)
+                        {
+                            str_1 = "NG, Arrow Angle(" + i + ")= " + string.Format("{0:#####0.00}", arrowAngle_Result);
+                            UI_RichTextBox_SystemLog_Text("    ArrowDetect Result! " + str_1);
+                        }
+                        else
+                        {
+                            str_1 = "OK, Arrow Angle(" + i + ")= " + string.Format("{0:#####0.00}", arrowAngle_Result);
+                            UI_RichTextBox_SystemLog_Text("    ArrowDetect Result! " + str_1);
+
+                            ////旋轉 影像中箭頭朝上
+                            //裁圖(旋轉前) 取大一點 比 4倍 radius
+                            //padding = 0;                           
+                            subImage = new Image<Gray, byte>(this.m_img_InputGray.Size.Width, this.m_img_InputGray.Size.Height);
+                            recROI = new Rectangle(center.X - 2 * radius, center.Y - 2 * radius, 4 * radius, 4 * radius);
+                            cropImage = new Image<Gray, byte>(4 * radius, 4 * radius);
+                            this.m_img_InputGray.CopyTo(subImage);
+                            CvInvoke.cvSetImageROI(subImage.Ptr, recROI);
+                            CvInvoke.cvCopy(subImage.Ptr, cropImage, IntPtr.Zero);
+
+                            //旋轉 設定   影像中箭頭朝上                     
+                            double rotateangle = (-1 * arrowAngle_Result + 90) * Math.PI / 180; // 弧度  
+                            double a = Math.Sin(rotateangle), b = Math.Cos(rotateangle);
+                            int width = cropImage.Width;
+                            int height = cropImage.Height;
+                            int width_rotate = Convert.ToInt32(height * Math.Abs(a) + width * Math.Abs(b));
+                            int height_rotate = Convert.ToInt32(width * Math.Abs(a) + height * Math.Abs(b));
+                            Matrix<float> map_matrix_temp = new Matrix<float>(2, 3);
+                            rotateImage = new Image<Gray, byte>(width_rotate, height_rotate);
+                            //旋轉 中心
+                            PointF rotateCenter = new PointF(width / 2, height / 2);
+                            CvInvoke.GetRotationMatrix2D(rotateCenter, -1 * arrowAngle_Result + 90, 1.0, map_matrix_temp);
+                            map_matrix_temp[0, 2] += (width_rotate - width) / 2;
+                            map_matrix_temp[1, 2] += (height_rotate - height) / 2;
+                            //旋轉
+                            CvInvoke.WarpAffine(cropImage, rotateImage, map_matrix_temp, new Size(width_rotate, height_rotate), Emgu.CV.CvEnum.Inter.Cubic, Emgu.CV.CvEnum.Warp.Default, Emgu.CV.CvEnum.BorderType.Transparent, new MCvScalar(0d, 0d, 0d, 0d));
+
+                            //CvInvoke.Imshow("cropImage - before Warp", cropImage);
+                            //CvInvoke.Imshow("rotateImage - before Warp", rotateImage);
+                            //CvInvoke.Imwrite(@"R:\rotateImage.bmp", rotateImage);
+
+                            //抓 Arrow Digital 數字
+                            subImage = new Image<Gray, byte>(rotateImage.Size.Width, rotateImage.Size.Height);
+                            digitalArrowImage = new Image<Gray, byte>(this.m_digitalArrow_Width, this.m_digitalArrow_Height);
+                            recROI = new Rectangle(rotateImage.Size.Width / 2 - digitalArrowImage.Width / 2, rotateImage.Size.Height / 2 - digitalArrowImage.Height / 2 - digitalArrowOffset, digitalArrowImage.Width, digitalArrowImage.Height);
+                            rotateImage.CopyTo(subImage);
+                            CvInvoke.cvSetImageROI(subImage.Ptr, recROI);
+                            CvInvoke.cvCopy(subImage.Ptr, digitalArrowImage, IntPtr.Zero);
+
+                            //CvInvoke.Imshow("digitalArrowImage-" + i, digitalArrowImage);
+                            //CvInvoke.Imshow("digitalArrowImage - after Warp", digitalArrowImage);
+                            //CvInvoke.Imshow("rotateImage - after Warp", rotateImage);
+                            //CvInvoke.Imwrite(@"R:\digitalImage.bmp", digitalImage);
+                            if (m_qtyOfCircle == 1) //加上左右的影像
+                            {
+                                //L Image
+                                subImage = new Image<Gray, byte>(rotateImage.Size.Width, rotateImage.Size.Height);
+                                digitalLImage = new Image<Gray, byte>(this.m_digitalRL_Width, this.m_digitalRL_Height);
+                                recROI = new Rectangle(rotateImage.Size.Width / 2 - digitalLImage.Width / 2 - digitalRLOffsetX, rotateImage.Size.Height / 2 - digitalLImage.Height / 2 + digitalRLOffsetY, digitalLImage.Width, digitalLImage.Height);
+                                rotateImage.CopyTo(subImage);
+                                CvInvoke.cvSetImageROI(subImage.Ptr, recROI);
+                                CvInvoke.cvCopy(subImage.Ptr, digitalLImage, IntPtr.Zero);
+                                //CvInvoke.Imshow("digitalLImage", digitalLImage);
+                                ////R Image
+                                subImage = new Image<Gray, byte>(rotateImage.Size.Width, rotateImage.Size.Height);
+                                digitalRImage = new Image<Gray, byte>(this.m_digitalRL_Width, this.m_digitalRL_Height);
+                                recROI = new Rectangle(rotateImage.Size.Width / 2 - digitalRImage.Width / 2 + digitalRLOffsetX, rotateImage.Size.Height / 2 - digitalRImage.Height / 2 + digitalRLOffsetY, digitalRImage.Width, digitalRImage.Height);
+                                rotateImage.CopyTo(subImage);
+                                CvInvoke.cvSetImageROI(subImage.Ptr, recROI);
+                                CvInvoke.cvCopy(subImage.Ptr, digitalRImage, IntPtr.Zero);
+                                //CvInvoke.Imshow("digitalRImage", digitalRImage);
+                            }
+                        }
+                        //System.Threading.Thread.Sleep(2000);                        
+                    }
+                }
+            }
+            UI_RichTextBox_SystemLog_Text("---------------------------------------------");
+            UpdateImage();
+
+            m_stopWatch.Stop();
+            TimeSpan ts = m_stopWatch.Elapsed;
+            string elapsedTime = "RunTime(HH:MM:SS:mS) " + String.Format("{0:00}:{1:00}:{2:00}.{3:000}", ts.Hours, ts.Minutes, ts.Seconds, ts.Milliseconds);
+            UI_RichTextBox_SystemLog_Text(elapsedTime);
+            Console.WriteLine(elapsedTime);
+
+            UI_RichTextBox_SystemLog_Text("==============================================");
+        }
+        private void UpdateImage()
+        {
+            if (this.RadioButton_InputImg.Checked)
+            {
+                this.ImageBox1.Image = this.m_img_InputGray;
+                UI_RichTextBox_SystemLog_Text("Changing to Input Image !");
+            }
+            else if (this.RadioButton_ThresImg.Checked)
+            {
+                this.ImageBox1.Image = this.m_img_Threshold;
+                UI_RichTextBox_SystemLog_Text("Changing to Threshold Image!");
+            }
+            else if (this.RadioButton_CannyImg.Checked)
+            {
+                this.ImageBox1.Image = this.m_img_Canny;
+                UI_RichTextBox_SystemLog_Text("Changing to Canny Image !");
+            }
+            else if (this.RadioButton_ContoursImg.Checked)
+            {
+                this.ImageBox1.Image = this.m_img_CannyforContours;
+                UI_RichTextBox_SystemLog_Text("Changing to Contours Image!");
+            }
+            else if (this.RadioButton_ResultImg.Checked)
+            {
+                this.ImageBox1.Image = this.m_img_Result;
+                UI_RichTextBox_SystemLog_Text("Changing to Result Image!");
+            }
+            else if (this.RadioButton_CircleImg.Checked)
+            {
+                this.ImageBox1.Image = this.m_img_HoughCircle;
+                UI_RichTextBox_SystemLog_Text("Changing to Circle Image!");
+            }
+        }
+
+        private void EdgeInitalPara()
+        {
+            //Edge Inital Para
+            if (this.RadioButton_EdgeVertical.Checked)
+            {
+                this.m_directOfEdge = "V";
+            }
+            else if (this.RadioButton_EdgeHorizontal.Checked)
+            {
+                this.m_directOfEdge = "H";
+            }
+        }
+        private void ArrowInitalPara()
+        {
+            //Arrow Inital Para
+            if (this.RadioButton_Type1_1Circle.Checked)
+            {
+                this.m_qtyOfCircle = 1;
+                this.m_digitalArrow_Width = 80;
+                this.m_digitalArrow_Height = 80;
+                this.m_digitalArrow_Offset = 170;
+                this.m_digitalRL_Width = 70;
+                this.m_digitalRL_Height = 110;
+                this.m_digitalRL_OffsetX = 65;
+                this.m_digitalRL_OffsetY = 10;
+
+                this.NumericUpDown_DigitalRL_Width.Enabled = true;
+                this.NumericUpDown_DigitalRL_Height.Enabled = true;
+                this.NumericUpDown_DigitalRL_OffsetX.Enabled = true;
+                this.NumericUpDown_DigitalRL_OffsetY.Enabled = true;
+            }
+            else if (this.RadioButton_Type2_1Circle.Checked)
+            {
+                this.m_qtyOfCircle = 1;
+                this.m_digitalArrow_Width = 110;
+                this.m_digitalArrow_Height = 100;
+                this.m_digitalArrow_Offset = 200;
+                this.m_digitalRL_Width = 110;
+                this.m_digitalRL_Height = 125;
+                this.m_digitalRL_OffsetX = 70;
+                this.m_digitalRL_OffsetY = 10;
+
+                this.NumericUpDown_DigitalRL_Width.Enabled = true;
+                this.NumericUpDown_DigitalRL_Height.Enabled = true;
+                this.NumericUpDown_DigitalRL_OffsetX.Enabled = true;
+                this.NumericUpDown_DigitalRL_OffsetY.Enabled = true;
+            }
+            else if (this.RadioButton_Type3_4Circle.Checked)
+            {
+                this.m_qtyOfCircle = 4;
+                this.m_digitalArrow_Width = 100;
+                this.m_digitalArrow_Height = 90;
+                this.m_digitalArrow_Offset = 120;
+                this.m_digitalRL_Width = 0;
+                this.m_digitalRL_Height = 0;
+                this.m_digitalRL_OffsetX = 0;
+                this.m_digitalRL_OffsetY = 0;
+
+                this.NumericUpDown_DigitalRL_Width.Enabled = false;
+                this.NumericUpDown_DigitalRL_Height.Enabled = false;
+                this.NumericUpDown_DigitalRL_OffsetX.Enabled = false;
+                this.NumericUpDown_DigitalRL_OffsetY.Enabled = false;
+            }
+
+            this.NumericUpDown_DigitalArrow_Width.Value = this.m_digitalArrow_Width;
+            this.NumericUpDown_DigitalArrow_Height.Value = this.m_digitalArrow_Height;
+            this.NumericUpDown_DigitalArrow_Offset.Value = this.m_digitalArrow_Offset;
+            this.NumericUpDown_DigitalRL_Width.Value = this.m_digitalRL_Width;
+            this.NumericUpDown_DigitalRL_Height.Value = this.m_digitalRL_Height;
+            this.NumericUpDown_DigitalRL_OffsetX.Value = this.m_digitalRL_OffsetX;
+            this.NumericUpDown_DigitalRL_OffsetY.Value = this.m_digitalRL_OffsetY;
+
+        }
+
+        #region "UI"
+        private void Form1_Load(object sender, EventArgs e)
+        {
+            if (RadioButton_EdgeFun.Checked)
+            {
+                this.RadioButton_CircleImg.Enabled = false;
+                this.groupBox_Circle.Enabled = false;
+                this.groupBox_Edge.Enabled = true;
+            }
+
+            this.EdgeInitalPara();
+
+            this.ArrowInitalPara();
+        }
+        private void Button_OpenFile_Click(object sender, EventArgs e)
+        {
+            if (openFileDialog1.ShowDialog() == DialogResult.OK)
+            {
+                this.m_img_InputGray = new Image<Gray, byte>(openFileDialog1.FileName); //(@"R:\Gray_1.bmp");
+                this.ImageBox1.Image = this.m_img_InputGray;
+            }
+        }
+        private void Button_IP_Click(object sender, EventArgs e)
+        {
+            this.ImageProcess();
+        }
+        private void Button_Save_Click(object sender, EventArgs e)
+        {
+            //img_Threshold.Save("R:\\Edge_1_Threshold.bmp");
+            //img_Canny.Save("R:\\Edge_1_Canny.bmp");
+        }
+        private void RadioButton_ArrowFun_CheckedChanged(object sender, EventArgs e)
+        {
+            if (RadioButton_ArrowFun.Checked)
+            {
+                this.RadioButton_CircleImg.Enabled = true;
+                this.groupBox_Circle.Enabled = true;
+                this.groupBox_Edge.Enabled = false;
+            }
+        }
+        private void RadioButton_EdgeFun_CheckedChanged(object sender, EventArgs e)
+        {
+            if (RadioButton_EdgeFun.Checked)
+            {
+                this.RadioButton_CircleImg.Enabled = false;
+                this.groupBox_Circle.Enabled = false;
+                this.groupBox_Edge.Enabled = true;
+            }
+        }
+        private void RadioButton_InputImg_CheckedChanged(object sender, EventArgs e)
+        {
+            if (this.RadioButton_InputImg.Checked)
+            {
+                UpdateImage();
+            }
+        }
+        private void RadioButton_ThresImg_CheckedChanged(object sender, EventArgs e)
+        {
+            if (this.RadioButton_ThresImg.Checked)
+            {
+                UpdateImage();
+            }
+        }
+        private void RadioButton_CannyImg_CheckedChanged(object sender, EventArgs e)
+        {
+            if (this.RadioButton_CannyImg.Checked)
+            {
+                UpdateImage();
+            }
+        }
+        private void RadioButton_ContoursImg_CheckedChanged(object sender, EventArgs e)
+        {
+            if (this.RadioButton_ContoursImg.Checked)
+            {
+                UpdateImage();
+            }
+        }
+        private void RadioButton_CircleImg_CheckedChanged(object sender, EventArgs e)
+        {
+            if (this.RadioButton_CircleImg.Checked)
+            {
+                UpdateImage();
+            }
+        }
+        private void RadioButton_ResultImg_CheckedChanged(object sender, EventArgs e)
+        {
+            if (this.RadioButton_ResultImg.Checked)
+            {
+                UpdateImage();
+            }
+        }
+
+        private void NumericUpDown_Thres_ValueChanged(object sender, EventArgs e)
+        {
+            if (this.m_img_InputGray is object)
+            {
+                this.ImageProcess();
+            }
+        }
+        private void NumericUpDown_DilateErode_ValueChanged(object sender, EventArgs e)
+        {
+            if (this.m_img_InputGray is object)
+            {
+                this.ImageProcess();
+            }
+        }
+        private void NumericUpDown_CannyTh1_ValueChanged(object sender, EventArgs e)
+        {
+            if (this.m_img_InputGray is object)
+            {
+                this.ImageProcess();
+            }
+        }
+        private void NumericUpDown_CannyTh2_ValueChanged(object sender, EventArgs e)
+        {
+            if (this.m_img_InputGray is object)
+            {
+                this.ImageProcess();
+            }
+        }
+        private void NumericUpDown_CannySobel_ValueChanged(object sender, EventArgs e)
+        {
+            if (this.m_img_InputGray is object)
+            {
+                this.ImageProcess();
+            }
+        }
+        private void NumericUpDown_EdgeFilterbyMinSize_ValueChanged(object sender, EventArgs e)
+        {
+            if (this.m_img_InputGray is object)
+            {
+                this.ImageProcess();
+            }
+        }
+        private void RadioButton_EdgeVertical_CheckedChanged(object sender, EventArgs e)
+        {
+            if (this.RadioButton_EdgeVertical.Checked)
+            {
+                this.m_directOfEdge = "V";
+            }
+        }
+        private void RadioButton_EdgeHorizontal_CheckedChanged(object sender, EventArgs e)
+        {
+            if (this.RadioButton_EdgeHorizontal.Checked)
+            {
+                this.m_directOfEdge = "H";
+            }
+        }
+        private void RadioButton_1Circle_CheckedChanged(object sender, EventArgs e)
+        {
+            this.ArrowInitalPara();
+        }
+        private void RadioButton_Type2_1Circle_CheckedChanged(object sender, EventArgs e)
+        {
+            this.ArrowInitalPara();
+        }
+        private void RadioButton_4Circle_CheckedChanged(object sender, EventArgs e)
+        {
+            this.ArrowInitalPara();
+        }
+        private void NumericUpDown_DigitalArrow_Width_ValueChanged(object sender, EventArgs e)
+        {
+            this.m_digitalArrow_Width = decimal.ToInt32(this.NumericUpDown_DigitalArrow_Width.Value);
+        }
+        private void NumericUpDown_DigitalArrow_Height_ValueChanged(object sender, EventArgs e)
+        {
+            this.m_digitalArrow_Height = decimal.ToInt32(this.NumericUpDown_DigitalArrow_Height.Value);
+        }
+        private void NumericUpDown_DigitalArrow_Offset_ValueChanged(object sender, EventArgs e)
+        {
+            this.m_digitalArrow_Offset = decimal.ToInt32(this.NumericUpDown_DigitalArrow_Offset.Value);
+        }
+        private void NumericUpDown_DigitalRL_Width_ValueChanged(object sender, EventArgs e)
+        {
+            this.m_digitalRL_Width = decimal.ToInt32(this.NumericUpDown_DigitalRL_Width.Value);
+        }
+        private void NumericUpDown_DigitalRL_Height_ValueChanged(object sender, EventArgs e)
+        {
+            this.m_digitalRL_Height = decimal.ToInt32(this.NumericUpDown_DigitalRL_Height.Value);
+        }
+        private void NumericUpDown_DigitalRL_OffsetX_ValueChanged(object sender, EventArgs e)
+        {
+            this.m_digitalRL_OffsetX = decimal.ToInt32(this.NumericUpDown_DigitalRL_OffsetX.Value);
+        }
+        private void NumericUpDown_DigitalRL_OffsetY_ValueChanged(object sender, EventArgs e)
+        {
+            this.m_digitalRL_OffsetY = decimal.ToInt32(this.NumericUpDown_DigitalRL_OffsetY.Value);
+        }
+        private void Button_FindCircle_Click(object sender, EventArgs e)
+        {
+            if (this.RadioButton_Type1_1Circle.Checked)
+            {
+                this.m_qtyOfCircle = 1;
+            }
+            else
+            {
+                this.m_qtyOfCircle = 4;
+            }
+
+            //Emgu.CV.Util.VectorOfPoint3D32F circles = new Emgu.CV.Util.VectorOfPoint3D32F();
+            List<(Point, int)> circlesInfo = new List<(Point, int)>();
+            string str = this.HoughCircleDetect(m_img_InputGray, ref m_img_HoughCircle, this.m_qtyOfCircle, ref circlesInfo);
+            UI_RichTextBox_SystemLog_Text("CircleDetect Done! " + str);
+
+            if (circlesInfo.Count == 0)
+            {
+                str = "NG, Qty of Circle= " + circlesInfo.Count;
+                UI_RichTextBox_SystemLog_Text("CircleDetect Result! " + str);
+            }
+            else
+            {
+                str = "OK, Qty of Circle= " + circlesInfo.Count;
+                UI_RichTextBox_SystemLog_Text("CircleDetect Result! " + str);
+            }
+
+            UpdateImage();
+        }
+        private void Button_FindArrow_Click(object sender, EventArgs e)
+        {
+            //ArrowDetect      this.m_img_InputGray 改成 cropImage
+            double arrow_Result = -999;
+            string str_1 = this.ArrowDetect(this.m_img_InputGray, ref this.m_img_Threshold, decimal.ToInt32(this.numericUpDown_Thres.Value), decimal.ToInt32(this.NumericUpDown_DilateErode.Value),
+                    ref this.m_img_Canny, decimal.ToInt32(this.NumericUpDown_CannyTh1.Value), decimal.ToInt32(this.NumericUpDown_CannyTh2.Value), decimal.ToInt32(this.NumericUpDown_CannySobel.Value),
+                    ref this.m_img_CannyforContours, ref this.m_img_Result, ref arrow_Result);
+            UI_RichTextBox_SystemLog_Text("---------------------------------------------");
+            UI_RichTextBox_SystemLog_Text("ArrowDetect Done! " + str_1);
+
+            //////////
+            if (arrow_Result < 0)
+            {
+                str_1 = "NG, Arrow Angle= " + string.Format("{0:#####0.00}", arrow_Result);
+                UI_RichTextBox_SystemLog_Text("    ArrowDetect Result! " + str_1);
+            }
+            else
+            {
+                str_1 = "OK, Arrow Angle= " + string.Format("{0:#####0.00}", arrow_Result);
+                UI_RichTextBox_SystemLog_Text("    ArrowDetect Result! " + str_1);
+            }
+
+            UpdateImage();
+        }
+        private void NumericUpDown_HoughLinesLength_ValueChanged(object sender, EventArgs e)
+        {
+            if (this.m_img_InputGray is object)
+            {
+                this.ImageProcess();
+            }
+        }
+        private void NumericUpDown_HoughLinesGap_ValueChanged(object sender, EventArgs e)
+        {
+            if (this.m_img_InputGray is object)
+            {
+                this.ImageProcess();
+            }
+        }
+        private void NumericUpDown_HoughLinesTh_ValueChanged(object sender, EventArgs e)
+        {
+            if (this.m_img_InputGray is object)
+            {
+                this.ImageProcess();
+            }
+        }
+        private void Button_ClearLog_Click(object sender, EventArgs e)
+        {
+            UI_RichTextBox_SystemLog_Clear();
+        }
+        private void RichTextBox_SystemLog_TextChanged(object sender, EventArgs e)
+        {
+            this.RichTextBox_SystemLog.ScrollToCaret();
+        }
+
+        public delegate void RichTextBox_SystemLog_TextCallback(string result);
+        private void UI_RichTextBox_SystemLog_Text(string result)
+        {
+            if (this.RichTextBox_SystemLog.InvokeRequired)
+            {
+                //this.Invoke(new RichTextBox_SystemLog_TextCallback(new System.EventHandler(this.UI_RichTextBox_SystemLog_Text)), new object[] {result});
+                RichTextBox_SystemLog_TextCallback d = new RichTextBox_SystemLog_TextCallback(UI_RichTextBox_SystemLog_Text);
+                this.Invoke(d, new object[] { result });
+            }
+            else
+            {
+                this.RichTextBox_SystemLog.AppendText((result + "\r\n"));
+                this.Update();
+            }
+
+        }
+
+        public delegate void RichTextBox_SystemLog_ClearCallback();
+        private void UI_RichTextBox_SystemLog_Clear()
+        {
+            if (this.RichTextBox_SystemLog.InvokeRequired)
+            {
+                //this.Invoke(new RichTextBox_SystemLog_TextCallback(new System.EventHandler(this.UI_RichTextBox_SystemLog_Text)), new object[] {result});
+                RichTextBox_SystemLog_ClearCallback d = new RichTextBox_SystemLog_ClearCallback(UI_RichTextBox_SystemLog_Clear);
+                this.Invoke(d, new object[] { });
+            }
+            else
+            {
+                this.RichTextBox_SystemLog.Clear();
+                this.Update();
+            }
+
+        }
+        private void CheckBox_CheckedChanged(object sender, EventArgs e)
+        {
+            if (this.CheckBox_ShowDetail.Checked)
+            {
+                this.m_detailInfoShow = true;
+            }
+            else
+            {
+                this.m_detailInfoShow = false;
+            }
+        }
+
+        #endregion
+    }
+}

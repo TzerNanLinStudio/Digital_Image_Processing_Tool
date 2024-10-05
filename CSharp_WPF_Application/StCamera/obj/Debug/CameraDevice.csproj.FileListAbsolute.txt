@@ -1,0 +1,2 @@
+E:\DEEPWISE\Project\Deantronics\Code\AOI_StationK(V.2020.06.18)\StCamera\obj\Debug\CameraDevice.csprojAssemblyReference.cache
+E:\DEEPWISE\Project\Deantronics\Code\AOI_StationK(V.2020.06.18)\StCamera\obj\Debug\CameraDevice.csproj.CoreCompileInputs.cache

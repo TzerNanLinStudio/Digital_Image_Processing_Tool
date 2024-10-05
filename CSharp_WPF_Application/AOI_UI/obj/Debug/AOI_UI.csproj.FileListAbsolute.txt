@@ -1,0 +1,9 @@
+E:\DEEPWISE\Project\Deantronics\Code\AOI_StationK(V.2020.06.18)\AOI_UI\obj\Debug\AOI_UI.csprojAssemblyReference.cache
+E:\DEEPWISE\Project\Deantronics\Code\AOI_StationK(V.2020.06.18)\AOI_UI\obj\Debug\CameraSetting.g.cs
+E:\DEEPWISE\Project\Deantronics\Code\AOI_StationK(V.2020.06.18)\AOI_UI\obj\Debug\CameraView.g.cs
+E:\DEEPWISE\Project\Deantronics\Code\AOI_StationK(V.2020.06.18)\AOI_UI\obj\Debug\MainWindow.g.cs
+E:\DEEPWISE\Project\Deantronics\Code\AOI_StationK(V.2020.06.18)\AOI_UI\obj\Debug\PLCUI.g.cs
+E:\DEEPWISE\Project\Deantronics\Code\AOI_StationK(V.2020.06.18)\AOI_UI\obj\Debug\App.g.cs
+E:\DEEPWISE\Project\Deantronics\Code\AOI_StationK(V.2020.06.18)\AOI_UI\obj\Debug\GeneratedInternalTypeHelper.g.cs
+E:\DEEPWISE\Project\Deantronics\Code\AOI_StationK(V.2020.06.18)\AOI_UI\obj\Debug\AOI_UI_MarkupCompile.cache
+E:\DEEPWISE\Project\Deantronics\Code\AOI_StationK(V.2020.06.18)\AOI_UI\obj\Debug\AOI_UI_MarkupCompile.lref

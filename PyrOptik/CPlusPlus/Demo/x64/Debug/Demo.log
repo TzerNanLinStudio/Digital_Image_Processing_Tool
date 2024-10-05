@@ -2,21 +2,21 @@
 C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\MSBuild\Current\Bin\Microsoft.Common.CurrentVersion.targets(2827,5): warning MSB3290: 無法建立類型程式庫 "{bee4bfec-6683-3e67-9167-3c0cbc68f40a}" 的包裝函式組件。已從 CLR 組件匯出類型程式庫 'System'，且不能再當做 CLR 組件匯入。
   Algorithm.cpp
   Data.cpp
-C:\Users\goodc\OneDrive\Desktop\Git\PyrOptik\CPlusPlus\Demo\Data.cpp(33,190): warning C4267: '引數': 將 'size_t' 轉換為 'int'，資料可能遺失
-C:\Users\goodc\OneDrive\Desktop\Git\PyrOptik\CPlusPlus\Demo\Data.cpp(38,186): warning C4267: '引數': 將 'size_t' 轉換為 'int'，資料可能遺失
-C:\Users\goodc\OneDrive\Desktop\Git\PyrOptik\CPlusPlus\Demo\Data.cpp(43,194): warning C4267: '引數': 將 'size_t' 轉換為 'int'，資料可能遺失
-C:\Users\goodc\OneDrive\Desktop\Git\PyrOptik\CPlusPlus\Demo\Data.cpp(87,72): warning C4244: '引數': 將 'int' 轉換為 'float'，由於類型不同，可能導致資料遺失
-C:\Users\goodc\OneDrive\Desktop\Git\PyrOptik\CPlusPlus\Demo\Data.cpp(87,62): warning C4244: '引數': 將 'int' 轉換為 'float'，由於類型不同，可能導致資料遺失
+C:\Users\goodc\OneDrive\Desktop\Git\Digital_Image_Processing_and_Analysis_Tool\PyrOptik\CPlusPlus\Demo\Data.cpp(33,190): warning C4267: '引數': 將 'size_t' 轉換為 'int'，資料可能遺失
+C:\Users\goodc\OneDrive\Desktop\Git\Digital_Image_Processing_and_Analysis_Tool\PyrOptik\CPlusPlus\Demo\Data.cpp(38,186): warning C4267: '引數': 將 'size_t' 轉換為 'int'，資料可能遺失
+C:\Users\goodc\OneDrive\Desktop\Git\Digital_Image_Processing_and_Analysis_Tool\PyrOptik\CPlusPlus\Demo\Data.cpp(43,194): warning C4267: '引數': 將 'size_t' 轉換為 'int'，資料可能遺失
+C:\Users\goodc\OneDrive\Desktop\Git\Digital_Image_Processing_and_Analysis_Tool\PyrOptik\CPlusPlus\Demo\Data.cpp(87,72): warning C4244: '引數': 將 'int' 轉換為 'float'，由於類型不同，可能導致資料遺失
+C:\Users\goodc\OneDrive\Desktop\Git\Digital_Image_Processing_and_Analysis_Tool\PyrOptik\CPlusPlus\Demo\Data.cpp(87,62): warning C4244: '引數': 將 'int' 轉換為 'float'，由於類型不同，可能導致資料遺失
   Main.cpp
   UI.cpp
-C:\Users\goodc\OneDrive\Desktop\Git\PyrOptik\CPlusPlus\Demo\UI.cpp(32,28): warning C4101: 'ex': 未參考的區域變數
-C:\Users\goodc\OneDrive\Desktop\Git\PyrOptik\CPlusPlus\Demo\UI.cpp(49,28): warning C4101: 'ee': 未參考的區域變數
-C:\Users\goodc\OneDrive\Desktop\Git\PyrOptik\CPlusPlus\Demo\UI.cpp(62,28): warning C4101: 'ex': 未參考的區域變數
-C:\Users\goodc\OneDrive\Desktop\Git\PyrOptik\CPlusPlus\Demo\UI.cpp(75,28): warning C4101: 'ex': 未參考的區域變數
-C:\Users\goodc\OneDrive\Desktop\Git\PyrOptik\CPlusPlus\Demo\UI.cpp(88,28): warning C4101: 'ex': 未參考的區域變數
-C:\Users\goodc\OneDrive\Desktop\Git\PyrOptik\CPlusPlus\Demo\UI.cpp(101,28): warning C4101: 'ex': 未參考的區域變數
-C:\Users\goodc\OneDrive\Desktop\Git\PyrOptik\CPlusPlus\Demo\UI.cpp(113,28): warning C4101: 'ex': 未參考的區域變數
-C:\Users\goodc\OneDrive\Desktop\Git\PyrOptik\CPlusPlus\Demo\UI.cpp(126,28): warning C4101: 'ex': 未參考的區域變數
+C:\Users\goodc\OneDrive\Desktop\Git\Digital_Image_Processing_and_Analysis_Tool\PyrOptik\CPlusPlus\Demo\UI.cpp(32,28): warning C4101: 'ex': 未參考的區域變數
+C:\Users\goodc\OneDrive\Desktop\Git\Digital_Image_Processing_and_Analysis_Tool\PyrOptik\CPlusPlus\Demo\UI.cpp(49,28): warning C4101: 'ee': 未參考的區域變數
+C:\Users\goodc\OneDrive\Desktop\Git\Digital_Image_Processing_and_Analysis_Tool\PyrOptik\CPlusPlus\Demo\UI.cpp(62,28): warning C4101: 'ex': 未參考的區域變數
+C:\Users\goodc\OneDrive\Desktop\Git\Digital_Image_Processing_and_Analysis_Tool\PyrOptik\CPlusPlus\Demo\UI.cpp(75,28): warning C4101: 'ex': 未參考的區域變數
+C:\Users\goodc\OneDrive\Desktop\Git\Digital_Image_Processing_and_Analysis_Tool\PyrOptik\CPlusPlus\Demo\UI.cpp(88,28): warning C4101: 'ex': 未參考的區域變數
+C:\Users\goodc\OneDrive\Desktop\Git\Digital_Image_Processing_and_Analysis_Tool\PyrOptik\CPlusPlus\Demo\UI.cpp(101,28): warning C4101: 'ex': 未參考的區域變數
+C:\Users\goodc\OneDrive\Desktop\Git\Digital_Image_Processing_and_Analysis_Tool\PyrOptik\CPlusPlus\Demo\UI.cpp(113,28): warning C4101: 'ex': 未參考的區域變數
+C:\Users\goodc\OneDrive\Desktop\Git\Digital_Image_Processing_and_Analysis_Tool\PyrOptik\CPlusPlus\Demo\UI.cpp(126,28): warning C4101: 'ex': 未參考的區域變數
   .NETFramework,Version=v4.6.1.AssemblyAttributes.cpp
   正在產生程式碼...
 C:\opencv\build\include\opencv2\core\cvstd.hpp(575): warning C4793: 'cv::String::String': 函式會編譯成機器碼:
@@ -82,4 +82,4 @@ C:\opencv\build\include\opencv2\core\cvstd.hpp(657): warning C4793: 'cv::String:
 C:\opencv\build\include\opencv2\core\mat.inl.hpp(713): warning C4793: 'cv::Mat::operator=': 函式會編譯成機器碼:
   	找到受控碼中不支援的內建
   Algorithm.obj : 發現 MSIL 模組。MSIL 的累加連結已停用。正在執行完整連結
-  Demo.vcxproj -> C:\Users\goodc\OneDrive\Desktop\Git\PyrOptik\CPlusPlus\x64\Debug\Demo.exe
+  Demo.vcxproj -> C:\Users\goodc\OneDrive\Desktop\Git\Digital_Image_Processing_and_Analysis_Tool\PyrOptik\CPlusPlus\x64\Debug\Demo.exe

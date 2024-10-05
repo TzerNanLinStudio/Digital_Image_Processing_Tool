@@ -1,0 +1,10 @@
+﻿  Stdafx.cpp
+  AssemblyInfo.cpp
+C:\Users\goodc\OneDrive\Desktop\Git\Digital_Image_Processing_and_Analysis_Tool\AOI_StationK(V.2021.01.21)\LogRecorder\AssemblyInfo.cpp(40,29): warning C4947: 'System::Security::Permissions::SecurityAction::RequestMinimum': 已標記為過時
+C:\Users\goodc\OneDrive\Desktop\Git\Digital_Image_Processing_and_Analysis_Tool\AOI_StationK(V.2021.01.21)\LogRecorder\AssemblyInfo.cpp(40,29): message : 訊息: 'Assembly level declarative security is obsolete and is no longer enforced by the CLR by default. See http://go.microsoft.com/fwlink/?LinkID=155570 for more information.'
+  InfoManager.cpp
+  LogRecorder.cpp
+  正在產生程式碼...
+  .NETFramework,Version=v4.0.AssemblyAttributes.cpp
+  LINK : 指定了 /LTCG，但未要求程式碼產生，請從連結命令列移除 /LTCG 以提升連結器效能
+  LogRecorder.vcxproj -> C:\Users\goodc\OneDrive\Desktop\Git\Digital_Image_Processing_and_Analysis_Tool\AOI_StationK(V.2021.01.21)\x64\Release\LogRecorder.dll

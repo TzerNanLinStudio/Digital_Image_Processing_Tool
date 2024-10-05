@@ -1,0 +1,389 @@
+﻿<Window x:Class="AOI_UI.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:AOI_UI"
+        xmlns:emgu="clr-namespace:Emgu.CV.UI;assembly=Emgu.CV.UI"
+        xmlns:wf="clr-namespace:System.Windows.Forms;assembly=System.Windows.Forms"      
+        mc:Ignorable="d"
+        FontSize="12"
+        FontFamily="Microsoft JhengHei"
+        Background="SkyBlue"
+        Icon="/UI/Icon.ico"
+        WindowStartupLocation="CenterScreen"
+        Title="AOI" Height="1000.0" Width="1200.0" Closing="MainWindow_Closing">
+
+    <Control.Resources>
+        <Style x:Key="buttonHover" TargetType="Button">
+            <Setter Property="Background" Value="#8a8c8e"/>
+            <Setter Property="Foreground" Value="Black"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Name="border" Background="{TemplateBinding Background}" BorderThickness="3" BorderBrush="Black" CornerRadius="3">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="Button.IsPressed" Value="True">
+                                <Setter TargetName="border" Property="BorderThickness" Value="5" />
+                            </Trigger>
+                            <Trigger Property="Button.IsPressed" Value="True">
+                                <Setter Property="Background" Value="#d3d7d4"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Control.Resources>
+
+    <Grid KeyDown="OnKeyDownHandler">
+
+        <TabControl x:Name="TabControl_Station" HorizontalAlignment="Left" Height="620" Margin="10,30,0,0" VerticalAlignment="Top" Width="1001" Background="SkyBlue" SelectionChanged="TabControl_Station_Selected">
+            <TabControl.Resources>
+                <Style TargetType="{x:Type TabItem}">
+                    <Setter Property="BorderThickness" Value="10"/>
+                    <Setter Property="Padding" Value="0" />
+                    <Setter Property="HeaderTemplate">
+                        <Setter.Value>
+                            <DataTemplate>
+                                <Border x:Name="grid" Background="DeepSkyBlue">
+                                    <ContentPresenter>
+                                        <ContentPresenter.Content>
+                                            <TextBlock Margin="4" FontSize="12" Text="{TemplateBinding Content}"/>
+                                        </ContentPresenter.Content>
+                                        <ContentPresenter.LayoutTransform>
+                                            <RotateTransform Angle="0" />
+                                        </ContentPresenter.LayoutTransform>
+                                    </ContentPresenter>
+                                </Border>
+                                <DataTemplate.Triggers>
+                                    <DataTrigger Binding="{Binding IsSelected, RelativeSource={RelativeSource AncestorType={x:Type TabItem}, Mode=FindAncestor}}" Value="True">
+                                        <Setter TargetName="grid" Property="Background" Value="DodgerBlue"/>
+                                    </DataTrigger>
+                                </DataTemplate.Triggers>
+                            </DataTemplate>
+                        </Setter.Value>
+                    </Setter>
+                </Style>
+            </TabControl.Resources>
+            <TabControl.BitmapEffect>
+                <DropShadowBitmapEffect Color="Black" Direction="270"/>
+            </TabControl.BitmapEffect>
+            <TabItem x:Name="TabItem_FirstStation" Header="K1檢測站" Visibility="Visible">
+                <Grid x:Name="Grid_FirstStation" IsEnabled="True">
+                    <WindowsFormsHost x:Name="DisplayWindow_First" Height="270" Width="360" RenderTransformOrigin="0.497,0.484" Margin="10,10,625,308">
+                        <emgu:ImageBox x:Name="ImageBox_FirstStation" Visible="True" SizeMode="Zoom" FunctionalMode="Minimum" BackColor="Black"
+                                       Paint="ImageBox_FirstStation_Paint" 
+                                       MouseDown="ImageBox_FirstStation_MouseDown" 
+                                       MouseUp="ImageBox_FirstStation_MouseUp" 
+                                       MouseMove="ImageBox_FirstStation_MouseMove"/>
+                    </WindowsFormsHost>
+                    <Button x:Name="Btn_F_Save" HorizontalAlignment="Left" Margin="100,280,0,0" VerticalAlignment="Top" Width="90" Height="60" RenderTransformOrigin="0.506,0.518" Click="Btn_F_Save_Click" Style="{StaticResource buttonHover}">
+                        <Button.Content>
+                            <StackPanel Orientation="Horizontal">
+                                <Image x:Name="Image_F_Save" Source="/UI/SaveImage.ico" Height="12"/>
+                                <TextBlock x:Name="TextBlock_F_Save" Text=" 儲存影像"/>
+                            </StackPanel>
+                        </Button.Content>
+                    </Button>
+                    <Button x:Name="Btn_F_Open" HorizontalAlignment="Left" Margin="10,280,0,0" VerticalAlignment="Top" Width="90" Height="60" RenderTransformOrigin="0.657,-1.434" Click="Btn_F_Open_Click" Style="{StaticResource buttonHover}">
+                        <Button.Content>
+                            <StackPanel Orientation="Horizontal">
+                                <Image x:Name="Image_F_Open" Source="/UI/OpenImage.ico" Height="12"/>
+                                <TextBlock x:Name="TextBlock_F_Open" Text=" 開啟影像"/>
+                            </StackPanel>
+                        </Button.Content>
+                    </Button>
+                    <Button x:Name="Btn_F_Grab" HorizontalAlignment="Left" Margin="190,280,0,0" VerticalAlignment="Top" Width="90" Height="60" RenderTransformOrigin="0.632,2.356" Click="Btn_F_Grab_Click" Style="{StaticResource buttonHover}">
+                        <Button.Content>
+                            <StackPanel Orientation="Horizontal">
+                                <Image x:Name="Image_F_Grab" Source="/UI/GrabImage.ico" Height="12"/>
+                                <TextBlock x:Name="TextBlock_F_Grab" Text=" 手動取像"/>
+                            </StackPanel>
+                        </Button.Content>
+                    </Button>
+                    <Button x:Name="Btn_F_Origin" HorizontalAlignment="Left" Margin="280,280,0,0" VerticalAlignment="Top" Width="90" Height="60" RenderTransformOrigin="0.632,2.356" Click="Btn_F_Origin_Click" Style="{StaticResource buttonHover}">
+                        <Button.Content>
+                            <StackPanel Orientation="Horizontal">
+                                <Image x:Name="Image_F_Origin" Source="/UI/OriginImage.ico" Height="12"/>
+                                <TextBlock x:Name="TextBlock_F_Origin" Text=" 恢復原圖"/>
+                            </StackPanel>
+                        </Button.Content>
+                    </Button>
+                    <TabControl x:Name="TabControl_F_ImageProcessingParameter" HorizontalAlignment="Left" Height="564" VerticalAlignment="Top" Width="595" Background="SkyBlue" Margin="390,10,0,0" Visibility="Visible">
+                        <TabControl.Resources>
+                            <Style TargetType="{x:Type TabItem}">
+                                <Setter Property="BorderThickness" Value="10"/>
+                                <Setter Property="Padding" Value="0" />
+                                <Setter Property="HeaderTemplate">
+                                    <Setter.Value>
+                                        <DataTemplate>
+                                            <Border x:Name="grid" Background="DeepSkyBlue">
+                                                <ContentPresenter>
+                                                    <ContentPresenter.Content>
+                                                        <TextBlock Margin="4" FontSize="12" Text="{TemplateBinding Content}"/>
+                                                    </ContentPresenter.Content>
+                                                    <ContentPresenter.LayoutTransform>
+                                                        <RotateTransform Angle="0" />
+                                                    </ContentPresenter.LayoutTransform>
+                                                </ContentPresenter>
+                                            </Border>
+                                            <DataTemplate.Triggers>
+                                                <DataTrigger Binding="{Binding IsSelected, RelativeSource={RelativeSource AncestorType={x:Type TabItem}, Mode=FindAncestor}}" Value="True">
+                                                    <Setter TargetName="grid" Property="Background" Value="DodgerBlue"/>
+                                                </DataTrigger>
+                                            </DataTemplate.Triggers>
+                                        </DataTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                            </Style>
+                        </TabControl.Resources>
+                        <TabControl.BitmapEffect>
+                            <DropShadowBitmapEffect Color="Black" Direction="270"/>
+                        </TabControl.BitmapEffect>
+                        <TabItem x:Name="FirstStation_Item01" Header="三芯線轉線角度判別">
+                            <Grid>
+                                <Border x:Name="GroupBox_F_Item01" Height="532" VerticalAlignment="Top" HorizontalAlignment="Left" Width="589">
+                                    <Grid>
+                                        <Button x:Name="Btn_F_Item01_IP" HorizontalAlignment="Left" Margin="295,462,0,0" VerticalAlignment="Top" Width="142" Height="60" Click="Btn_F_IP_Click" RenderTransformOrigin="0.507,0.435" Style="{StaticResource buttonHover}">
+                                            <StackPanel Orientation="Horizontal">
+                                                <Image x:Name="Image_F_Item01_IP" Source="/UI/IP.ico" Height="12"/>
+                                                <TextBlock x:Name="TextBlock_F_Item01_IP" Text=" 影像處理"/>
+                                            </StackPanel>
+                                        </Button>
+                                        <Border x:Name="Border_F_Item01_PartResult" BorderBrush="Black" BorderThickness="3" HorizontalAlignment="Left" Height="60" Margin="10,462,0,0" VerticalAlignment="Top" Width="285" Background="Red">
+                                            <Grid>
+                                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Center">
+                                                    <Label x:Name="Label_F_Item01_PartResult" Content="Degree : 0°" FontSize="12"/>
+                                                </StackPanel>
+                                            </Grid>
+                                        </Border>
+                                        <TabControl x:Name="TabControl_F_Item01_ImageProcessingParameter" HorizontalAlignment="Left" Height="437" Width="569" VerticalAlignment="Top" Background="SkyBlue" TabStripPlacement="Left" Margin="10,10,0,0">
+                                            <TabControl.Resources>
+                                                <Style TargetType="{x:Type TabItem}">
+                                                    <Setter Property="BorderThickness" Value="10"/>
+                                                    <Setter Property="Padding" Value="0" />
+                                                    <Setter Property="HeaderTemplate">
+                                                        <Setter.Value>
+                                                            <DataTemplate>
+                                                                <Border x:Name="grid" Background="DeepSkyBlue">
+                                                                    <ContentPresenter>
+                                                                        <ContentPresenter.Content>
+                                                                            <TextBlock Margin="4" FontSize="12" Text="{TemplateBinding Content}"/>
+                                                                        </ContentPresenter.Content>
+                                                                        <ContentPresenter.LayoutTransform>
+                                                                            <RotateTransform Angle="0" />
+                                                                        </ContentPresenter.LayoutTransform>
+                                                                    </ContentPresenter>
+                                                                </Border>
+                                                                <DataTemplate.Triggers>
+                                                                    <DataTrigger Binding="{Binding IsSelected, RelativeSource={RelativeSource AncestorType={x:Type TabItem}, Mode=FindAncestor}}" Value="True">
+                                                                        <Setter TargetName="grid" Property="Background" Value="DodgerBlue"/>
+                                                                    </DataTrigger>
+                                                                </DataTemplate.Triggers>
+                                                            </DataTemplate>
+                                                        </Setter.Value>
+                                                    </Setter>
+                                                </Style>
+                                            </TabControl.Resources>
+                                            <TabControl.BitmapEffect>
+                                                <DropShadowBitmapEffect Color="Black" Direction="270"/>
+                                            </TabControl.BitmapEffect>
+                                            <TabItem Header=" 1 " Background="SkyBlue">
+                                                <Grid Margin="0,0,0,0">
+                                                    <Border x:Name="GroupBox_F_Item01_Page01" HorizontalAlignment="Left" Height="424" VerticalAlignment="Top" Width="540">
+                                                        <Grid>
+                                                            <RadioButton x:Name="RadioButton_F_Item01_ROI01" Content="ROI" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.279,0.398" Checked="RadioButton_FirstStation_Checked"/>
+                                                            <RadioButton x:Name="RadioButton_F_Item01_Result01" Content="結果" HorizontalAlignment="Left" Margin="120,10,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.279,0.398" Checked="RadioButton_FirstStation_Checked"/>
+                                                            <GroupBox x:Name="GroupBox_F_PassAngle_Copy" Header="轉線檢測區域設定" HorizontalAlignment="Left" Height="86" Margin="10,33,0,0" VerticalAlignment="Top" Width="520">
+                                                                <Grid>
+                                                                    <Label Content="外被間距(mm) : " HorizontalAlignment="Left" VerticalAlignment="Top" Margin="280,18,0,0"/>
+                                                                    <Button x:Name="Btn_F_Item01_ROI" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Width="200"  Height="40" RenderTransformOrigin="0.507,0.435" Click="Btn_F_ROI_Click" Style="{StaticResource buttonHover}">
+                                                                        <StackPanel Orientation="Horizontal">
+                                                                            <Image x:Name="Image_F_ROI" Source="/UI/SetROI.ico" Height="12"/>
+                                                                            <TextBlock x:Name="TextBlock_F_ROI" Text=" 設定ROI"/>
+                                                                        </StackPanel>
+                                                                    </Button>
+                                                                </Grid>
+                                                            </GroupBox>
+                                                            <GroupBox x:Name="GroupBox_F_Item01_PassAngle" Header="Pass角度區間設定" HorizontalAlignment="Left" Height="75" Margin="10,124,0,0" VerticalAlignment="Top" Width="520">
+                                                                <Grid>
+                                                                    <Label Content="角度下限 : " HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,12,0,0" RenderTransformOrigin="0.519,0.207"/>
+                                                                    <Label Content="角度上限 : " HorizontalAlignment="Left" VerticalAlignment="Top" Margin="280,12,0,0"/>
+                                                                    <WindowsFormsHost Margin="120,14,298,13" Height="25"  Width="90">
+                                                                        <wf:NumericUpDown x:Name="NumericUpDown_F_Item01_PassAngle01" AccessibleName="NumericUpDown_F_Item01_PassAngle01" Minimum="-180" Maximum="180" Value="0" ValueChanged="NumericUpDown_F_Parameter_ValueChanged"/>
+                                                                    </WindowsFormsHost>
+                                                                </Grid>
+                                                            </GroupBox>
+                                                        </Grid>
+                                                    </Border>
+                                                </Grid>
+                                            </TabItem>
+                                            <TabItem Header=" 2 " Background="SkyBlue">
+                                                <Grid>
+                                                    <Border x:Name="GroupBox_F_Item01_Page02" HorizontalAlignment="Left" Height="424" VerticalAlignment="Top" Width="540">
+                                                        <Grid/>
+                                                    </Border>
+                                                </Grid>
+                                            </TabItem>
+                                        </TabControl>
+                                    </Grid>
+                                </Border>
+                            </Grid>
+                        </TabItem>
+                        <TabItem x:Name="FirstStation_Item02" Header="三芯線色差判別">
+                            <Grid>
+                                <Border HorizontalAlignment="Left" Height="532" VerticalAlignment="Top" Width="589">
+                                    <Grid>
+                                        <RadioButton x:Name="RadioButton_F_Item02_ROI" Content="ROI" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.279,0.398" Checked="RadioButton_FirstStation_Checked"/>
+                                        <RadioButton x:Name="RadioButton_F_Item02_Result" Content="結果" HorizontalAlignment="Left" Margin="117,10,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.279,0.398" Checked="RadioButton_FirstStation_Checked"/>
+                                        <Button x:Name="Btn_F_Item02_IP" HorizontalAlignment="Left" Margin="295,462,0,0" VerticalAlignment="Top" Width="142" Height="60" Click="Btn_F_IP_Click" RenderTransformOrigin="0.507,0.435" Style="{StaticResource buttonHover}">
+                                            <StackPanel Orientation="Horizontal">
+                                                <Image x:Name="Image_F_Item02_IP" Source="UI/IP.ico" Height="12"/>
+                                                <TextBlock x:Name="TextBlock_F_Item02_IP" Text=" 影像處理"/>
+                                            </StackPanel>
+                                        </Button>
+                                        <Border x:Name="Border_F_Item02_PartResult" BorderBrush="Black" BorderThickness="3" HorizontalAlignment="Left" Height="60" Margin="10,462,0,0" VerticalAlignment="Top" Width="285" Background="Red">
+                                            <Grid>
+                                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Center">
+                                                    <Label x:Name="Label_F_Item02_PartResult" Content="Area : 00.00%" FontSize="12"/>
+                                                </StackPanel>
+                                            </Grid>
+                                        </Border>
+                                        <GroupBox x:Name="GroupBox_F_Item02_Blue" Header="藍線檢測區域設定" HorizontalAlignment="Left" Height="107" Margin="10,33,0,0" VerticalAlignment="Top" Width="569">
+                                            <Grid>
+                                                <Label Content="藍色像素下限 : " HorizontalAlignment="Left" Margin="10,0,0,0" VerticalAlignment="Top"/>
+                                                <Label Content="藍色像素 - 紅色像素 : " HorizontalAlignment="Left" Margin="10,28,0,0" VerticalAlignment="Top"/>
+                                                <Label Content="紅色像素上限 : " HorizontalAlignment="Left" Margin="10,56,0,0" VerticalAlignment="Top"/>
+                                                <WindowsFormsHost Margin="297,2,10,57" Height="25" Width="250">
+                                                    <wf:NumericUpDown x:Name="NumericUpDown_F_Item02_Parameter0101" AccessibleName="NumericUpDown_F_Item02_Parameter0101" Minimum="0" Maximum="255" Value="0" ValueChanged="NumericUpDown_F_Parameter_ValueChanged"/>
+                                                </WindowsFormsHost>
+                                                <WindowsFormsHost Margin="297,30,10,29" Height="25"  Width="250">
+                                                    <wf:NumericUpDown x:Name="NumericUpDown_F_Item02_Parameter0102" AccessibleName="NumericUpDown_F_Item02_Parameter0102" Minimum="0" Maximum="255" Value="0" ValueChanged="NumericUpDown_F_Parameter_ValueChanged"/>
+                                                </WindowsFormsHost>
+                                                <WindowsFormsHost Margin="297,58,10,1" Height="25"  Width="250">
+                                                    <wf:NumericUpDown x:Name="NumericUpDown_F_Item02_Parameter0103" AccessibleName="NumericUpDown_F_Item02_Parameter0103" Minimum="0" Maximum="255" Value="0" ValueChanged="NumericUpDown_F_Parameter_ValueChanged"/>
+                                                </WindowsFormsHost>
+                                            </Grid>
+                                        </GroupBox>
+                                        <GroupBox x:Name="GroupBox_F_Item02_White" Header="White" HorizontalAlignment="Left" Height="107" Margin="10,145,0,0" VerticalAlignment="Top" Width="569">
+                                            <Grid>
+                                                <Label Content="藍色像素下限 : " HorizontalAlignment="Left" Margin="10,0,0,0" VerticalAlignment="Top"/>
+                                                <Label Content="綠色像素下限 : " HorizontalAlignment="Left" Margin="10,28,0,0" VerticalAlignment="Top"/>
+                                                <Label Content="紅色像素下限 : " HorizontalAlignment="Left" Margin="10,56,0,0" VerticalAlignment="Top"/>
+                                                <WindowsFormsHost Margin="297,2,10,57" Height="25" Width="250">
+                                                    <wf:NumericUpDown x:Name="NumericUpDown_F_Item02_Parameter0201" AccessibleName="NumericUpDown_F_Item02_Parameter0201" Minimum="0" Maximum="255" Value="0" ValueChanged="NumericUpDown_F_Parameter_ValueChanged"/>
+                                                </WindowsFormsHost>
+                                                <WindowsFormsHost Margin="297,30,10,29" Height="25" Width="250">
+                                                    <wf:NumericUpDown x:Name="NumericUpDown_F_Item02_Parameter0202" AccessibleName="NumericUpDown_F_Item02_Parameter0202" Minimum="0" Maximum="255" Value="0" ValueChanged="NumericUpDown_F_Parameter_ValueChanged"/>
+                                                </WindowsFormsHost>
+                                                <WindowsFormsHost Margin="297,57,10,2" Height="25" Width="250">
+                                                    <wf:NumericUpDown x:Name="NumericUpDown_F_Item02_Parameter0203" AccessibleName="NumericUpDown_F_Item02_Parameter0203" Minimum="0" Maximum="255" Value="0" ValueChanged="NumericUpDown_F_Parameter_ValueChanged"/>
+                                                </WindowsFormsHost>
+                                            </Grid>
+                                        </GroupBox>
+                                        <GroupBox x:Name="GroupBox_F_Item02_Red" Header="Red" HorizontalAlignment="Left" Height="107" Margin="10,257,0,0" VerticalAlignment="Top" Width="569">
+                                            <Grid>
+                                                <Label Content="紅色像素下限 : " HorizontalAlignment="Left" Margin="10,0,0,0" VerticalAlignment="Top"/>
+                                                <Label Content="紅色像素 - 藍色像素 : " HorizontalAlignment="Left" Margin="10,28,0,0" VerticalAlignment="Top"/>
+                                                <Label Content="藍色像素上限 : " HorizontalAlignment="Left" Margin="10,56,0,0" VerticalAlignment="Top"/>
+                                                <WindowsFormsHost Margin="297,2,10,57" Height="25" Width="250">
+                                                    <wf:NumericUpDown x:Name="NumericUpDown_F_Item02_Parameter0301" AccessibleName="NumericUpDown_F_Item02_Parameter0301" Minimum="0" Maximum="255" Value="0" ValueChanged="NumericUpDown_F_Parameter_ValueChanged"/>
+                                                </WindowsFormsHost>
+                                                <WindowsFormsHost Margin="297,30,10,29" Height="25" Width="250">
+                                                    <wf:NumericUpDown x:Name="NumericUpDown_F_Item02_Parameter0302" AccessibleName="NumericUpDown_F_Item02_Parameter0302" Minimum="0" Maximum="255" Value="0" ValueChanged="NumericUpDown_F_Parameter_ValueChanged"/>
+                                                </WindowsFormsHost>
+                                                <WindowsFormsHost Margin="297,57,10,2" Height="25" Width="250">
+                                                    <wf:NumericUpDown x:Name="NumericUpDown_F_Item02_Parameter0303" AccessibleName="NumericUpDown_F_Item02_Parameter0303" Minimum="0" Maximum="255" Value="0" ValueChanged="NumericUpDown_F_Parameter_ValueChanged"/>
+                                                </WindowsFormsHost>
+                                            </Grid>
+                                        </GroupBox>
+                                    </Grid>
+                                </Border>
+
+                            </Grid>
+                        </TabItem>
+                    </TabControl>
+                    <GroupBox x:Name="GroupBox_F_Adjustment" Header="光學校正" HorizontalAlignment="Left" Height="568" Width="605" Margin="380,10,0,0" VerticalAlignment="Top" Visibility="Hidden">
+                        <Grid>
+                            <Button x:Name="Btn_F_Adjustment" Height="84" Width="568" Margin="10,10,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Click="Btn_F_ROI_Click" Style="{StaticResource buttonHover}">
+                                <Button.Content>
+                                    <StackPanel Orientation="Horizontal">
+                                        <Image x:Name="Image_F_Adjustment" Source="/UI/SetROI.ico" Height="20"/>
+                                        <TextBlock x:Name="TextBlock_F_Adjustment" Text=" 設定ROI"/>
+                                    </StackPanel>
+                                </Button.Content>
+                            </Button>
+                            <GroupBox Header="對焦校正" Height="110" Width="281" Margin="10,99,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" >
+                                <Grid>
+                                    <Label x:Name="Label_F_IdealSharp" Content="理想銳利度 : " Height="30" Width="249" Margin="10,10,0,0" VerticalAlignment="Top" HorizontalAlignment="Left"/>
+                                    <Label x:Name="Label_F_CurrentSharp" Content="當前銳利度 : " Width="249" Margin="10,45,0,0" HorizontalAlignment="Left" Height="30" VerticalAlignment="Top"/>
+                                </Grid>
+                            </GroupBox>
+                            <GroupBox Header="曝光校正" Height="110" Width="281" Margin="297,99,0,0" HorizontalAlignment="Left" VerticalAlignment="Top">
+                                <Grid>
+                                    <Label x:Name="Label_F_IdealLight" Content="理想亮度 : " Height="30" Width="249" Margin="10,10,0,0" VerticalAlignment="Top" HorizontalAlignment="Left"/>
+                                    <Label x:Name="Label_F_CurrentLight" Content="當前亮度 : " Width="249" Margin="10,45,0,0" HorizontalAlignment="Left" Height="30" VerticalAlignment="Top"/>
+                                </Grid>
+                            </GroupBox>
+                        </Grid>
+                    </GroupBox>
+                </Grid>
+            </TabItem>
+        </TabControl>
+        <TabControl Grid.Column="0" TabStripPlacement="Top" Margin="10,841,0,0" HorizontalAlignment="Left" Width="805" Height="113" VerticalAlignment="Top">
+            <TabControl.Resources>
+                <Style TargetType="{x:Type TabItem}">
+                    <Setter Property="BorderThickness" Value="10"/>
+                    <Setter Property="Padding" Value="0" />
+                    <Setter Property="HeaderTemplate">
+                        <Setter.Value>
+                            <DataTemplate>
+                                <Border x:Name="grid" Background="DeepSkyBlue">
+                                    <ContentPresenter>
+                                        <ContentPresenter.Content>
+                                            <TextBlock Margin="4" FontSize="12" Text="{TemplateBinding Content}"/>
+                                        </ContentPresenter.Content>
+                                        <ContentPresenter.LayoutTransform>
+                                            <RotateTransform Angle="0" />
+                                        </ContentPresenter.LayoutTransform>
+                                    </ContentPresenter>
+                                </Border>
+                                <DataTemplate.Triggers>
+                                    <DataTrigger Binding="{Binding IsSelected, RelativeSource={RelativeSource AncestorType={x:Type TabItem}, Mode=FindAncestor}}" Value="True">
+                                        <Setter TargetName="grid" Property="Background" Value="DodgerBlue"/>
+                                    </DataTrigger>
+                                </DataTemplate.Triggers>
+                            </DataTemplate>
+                        </Setter.Value>
+                    </Setter>
+                </Style>
+                <Style TargetType="{x:Type Paragraph}">
+                    <Setter Property="Margin" Value="0" />
+                </Style>
+            </TabControl.Resources>
+            <TabControl.BitmapEffect>
+                <DropShadowBitmapEffect Color="Black" Direction="270"/>
+            </TabControl.BitmapEffect>
+            <TabItem Header="資訊">
+                <RichTextBox x:Name="RichTextBox_GeneralLog" IsReadOnly="True" Margin="0,0,0,0"/>
+            </TabItem>
+            <TabItem Header="警告">
+                <RichTextBox x:Name="RichTextBox_WarningLog" IsReadOnly="True" Margin="0,0,0,0"/>
+            </TabItem>
+            <TabItem Header="錯誤">
+                <RichTextBox x:Name="RichTextBox_ErrorLog" IsReadOnly="True" Margin="0,0,0,0"/>
+            </TabItem>
+            <TabItem x:Name="TabItem_DebugLog" Header="Debug" Visibility="Visible">
+                <RichTextBox x:Name="RichTextBox_DebugLog" IsReadOnly="True" Margin="0,0,0,0"/>
+            </TabItem>
+        </TabControl>
+
+        
+        <Border BorderBrush="Black" BorderThickness="1" HorizontalAlignment="Left" Height="178" Margin="10,658,0,0" VerticalAlignment="Top" Width="330" Background="Red" Visibility="Hidden"/>
+        <Border BorderBrush="Black" BorderThickness="1" HorizontalAlignment="Left" Height="178" Margin="345,658,0,0" VerticalAlignment="Top" Width="330" Background="Red" Visibility="Hidden"/>
+        <Border BorderBrush="Black" BorderThickness="1" HorizontalAlignment="Left" Height="178" Margin="680,658,0,0" VerticalAlignment="Top" Width="330" Background="Red" Visibility="Hidden"/>
+    </Grid>
+</Window>

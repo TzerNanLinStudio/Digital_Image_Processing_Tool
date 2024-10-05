@@ -1,0 +1,3 @@
+E:\DEEPWISE\Project\Deantronics\Code\AOI_StationK(V.2020.06.18)\LogRecorder\x64\Debug\LogRecorder.vcxprojAssemblyReference.cache
+C:\Users\DEEPWISE\Desktop\Deantronics\Code\AOI_StationK(V.New)\LogRecorder\x64\Debug\LogRecorder.vcxprojAssemblyReference.cache
+C:\Users\DEEPWISE\Desktop\Deantronics\ThreeCoreLine\Code\AOI_StationK(V.New)\LogRecorder\x64\Debug\LogRecorder.vcxprojAssemblyReference.cache
