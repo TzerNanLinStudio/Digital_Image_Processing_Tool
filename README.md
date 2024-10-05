@@ -12,22 +12,22 @@ The latest version of the application boasted a wealth of image-processing funct
 
 The following is an example of finding feature contours through digital image processing technology in this auxiliary tool. **(More explaination will be updated soon)**
 
-![Image Error](./Other/Image/image_01.png)
+![Image Error](./CPlusPlus_WindowsForm_Application/Other/Image/image_01.png)
 
 The above screenshot is application's initial user interface.
 
-![Image Error](./Other/Image/image_02.png)
+![Image Error](./CPlusPlus_WindowsForm_Application/Other/Image/image_02.png)
 
 The above screenshot shows how to load the image.
 
-![Image Error](./Other/Image/image_03.png)
+![Image Error](./CPlusPlus_WindowsForm_Application/Other/Image/image_03.png)
 
 The above screenshot shows how to make the image grayscale.
 
-![Image Error](./Other/Image/image_04.png)
+![Image Error](./CPlusPlus_WindowsForm_Application/Other/Image/image_04.png)
 
 The above screenshot shows how to binarize the image.
 
-![Image Error](./Other/Image/image_05.png)
+![Image Error](./CPlusPlus_WindowsForm_Application/Other/Image/image_05.png)
 
 The above screenshot shows how to find circular contours.
