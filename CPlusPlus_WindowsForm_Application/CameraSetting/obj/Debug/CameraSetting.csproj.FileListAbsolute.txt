@@ -6,3 +6,10 @@ C:\Users\goodc\OneDrive\Desktop\Git\Digital_Image_Processing_and_Analysis_Tool\C
 C:\Users\goodc\OneDrive\Desktop\Git\Digital_Image_Processing_and_Analysis_Tool\CameraSetting\obj\Debug\CameraSetting.csproj.CoreCompileInputs.cache
 C:\Users\goodc\OneDrive\Desktop\Git\Digital_Image_Processing_and_Analysis_Tool\CameraSetting\obj\Debug\ClassLibrary1.dll
 C:\Users\goodc\OneDrive\Desktop\Git\Digital_Image_Processing_and_Analysis_Tool\CameraSetting\obj\Debug\ClassLibrary1.pdb
+C:\Users\goodc\OneDrive\Desktop\Git\Digital_Image_Processing_and_Analysis_Tool\CPlusPlus_WindowsForm_Application\CameraSetting\bin\Debug\ClassLibrary1.dll
+C:\Users\goodc\OneDrive\Desktop\Git\Digital_Image_Processing_and_Analysis_Tool\CPlusPlus_WindowsForm_Application\CameraSetting\bin\Debug\ClassLibrary1.pdb
+C:\Users\goodc\OneDrive\Desktop\Git\Digital_Image_Processing_and_Analysis_Tool\CPlusPlus_WindowsForm_Application\CameraSetting\obj\Debug\CameraSetting.UserControlOfCameraSetting.resources
+C:\Users\goodc\OneDrive\Desktop\Git\Digital_Image_Processing_and_Analysis_Tool\CPlusPlus_WindowsForm_Application\CameraSetting\obj\Debug\CameraSetting.csproj.GenerateResource.cache
+C:\Users\goodc\OneDrive\Desktop\Git\Digital_Image_Processing_and_Analysis_Tool\CPlusPlus_WindowsForm_Application\CameraSetting\obj\Debug\CameraSetting.csproj.CoreCompileInputs.cache
+C:\Users\goodc\OneDrive\Desktop\Git\Digital_Image_Processing_and_Analysis_Tool\CPlusPlus_WindowsForm_Application\CameraSetting\obj\Debug\ClassLibrary1.dll
+C:\Users\goodc\OneDrive\Desktop\Git\Digital_Image_Processing_and_Analysis_Tool\CPlusPlus_WindowsForm_Application\CameraSetting\obj\Debug\ClassLibrary1.pdb

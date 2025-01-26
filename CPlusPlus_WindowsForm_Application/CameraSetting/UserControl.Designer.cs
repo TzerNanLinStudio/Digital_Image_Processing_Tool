@@ -28,7 +28,6 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.button_Test001 = new System.Windows.Forms.Button();
             this.label_Exposure = new System.Windows.Forms.Label();
             this.label_FPS = new System.Windows.Forms.Label();
             this.label_Gain = new System.Windows.Forms.Label();
@@ -36,25 +35,8 @@
             this.label_GainValue = new System.Windows.Forms.Label();
             this.label_ExposureValue = new System.Windows.Forms.Label();
             this.groupBox_CameraImformation = new System.Windows.Forms.GroupBox();
-            this.numericUpDown_Exposure = new System.Windows.Forms.NumericUpDown();
-            this.numericUpDown_Gain = new System.Windows.Forms.NumericUpDown();
-            this.numericUpDown_FPS = new System.Windows.Forms.NumericUpDown();
             this.groupBox_CameraImformation.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown_Exposure)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown_Gain)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown_FPS)).BeginInit();
             this.SuspendLayout();
-            // 
-            // button_Test001
-            // 
-            this.button_Test001.Font = new System.Drawing.Font("微軟正黑體", 15F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
-            this.button_Test001.Location = new System.Drawing.Point(327, 107);
-            this.button_Test001.Name = "button_Test001";
-            this.button_Test001.Size = new System.Drawing.Size(120, 40);
-            this.button_Test001.TabIndex = 0;
-            this.button_Test001.Text = "Test";
-            this.button_Test001.UseVisualStyleBackColor = true;
-            this.button_Test001.Click += new System.EventHandler(this.button_Test001_Click);
             // 
             // label_Exposure
             // 
@@ -127,50 +109,10 @@
             this.groupBox_CameraImformation.Font = new System.Drawing.Font("微軟正黑體", 15F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
             this.groupBox_CameraImformation.Location = new System.Drawing.Point(3, 3);
             this.groupBox_CameraImformation.Name = "groupBox_CameraImformation";
-            this.groupBox_CameraImformation.Size = new System.Drawing.Size(249, 144);
+            this.groupBox_CameraImformation.Size = new System.Drawing.Size(224, 144);
             this.groupBox_CameraImformation.TabIndex = 8;
             this.groupBox_CameraImformation.TabStop = false;
             this.groupBox_CameraImformation.Text = "Camera Imformation";
-            // 
-            // numericUpDown_Exposure
-            // 
-            this.numericUpDown_Exposure.Font = new System.Drawing.Font("微軟正黑體", 15F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
-            this.numericUpDown_Exposure.Location = new System.Drawing.Point(327, 3);
-            this.numericUpDown_Exposure.Maximum = new decimal(new int[] {
-            100000,
-            0,
-            0,
-            0});
-            this.numericUpDown_Exposure.Name = "numericUpDown_Exposure";
-            this.numericUpDown_Exposure.Size = new System.Drawing.Size(120, 34);
-            this.numericUpDown_Exposure.TabIndex = 9;
-            this.numericUpDown_Exposure.ValueChanged += new System.EventHandler(this.numericUpDown_Exposure_ValueChanged);
-            // 
-            // numericUpDown_Gain
-            // 
-            this.numericUpDown_Gain.Font = new System.Drawing.Font("微軟正黑體", 15F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
-            this.numericUpDown_Gain.Location = new System.Drawing.Point(327, 39);
-            this.numericUpDown_Gain.Maximum = new decimal(new int[] {
-            1000,
-            0,
-            0,
-            0});
-            this.numericUpDown_Gain.Name = "numericUpDown_Gain";
-            this.numericUpDown_Gain.Size = new System.Drawing.Size(120, 34);
-            this.numericUpDown_Gain.TabIndex = 10;
-            // 
-            // numericUpDown_FPS
-            // 
-            this.numericUpDown_FPS.Font = new System.Drawing.Font("微軟正黑體", 15F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
-            this.numericUpDown_FPS.Location = new System.Drawing.Point(327, 74);
-            this.numericUpDown_FPS.Maximum = new decimal(new int[] {
-            1000,
-            0,
-            0,
-            0});
-            this.numericUpDown_FPS.Name = "numericUpDown_FPS";
-            this.numericUpDown_FPS.Size = new System.Drawing.Size(120, 34);
-            this.numericUpDown_FPS.TabIndex = 11;
             // 
             // UserControlOfCameraSetting
             // 
@@ -178,25 +120,17 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.DeepSkyBlue;
             this.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
-            this.Controls.Add(this.numericUpDown_Exposure);
-            this.Controls.Add(this.numericUpDown_Gain);
-            this.Controls.Add(this.numericUpDown_FPS);
             this.Controls.Add(this.groupBox_CameraImformation);
-            this.Controls.Add(this.button_Test001);
             this.Name = "UserControlOfCameraSetting";
-            this.Size = new System.Drawing.Size(450, 150);
+            this.Size = new System.Drawing.Size(240, 150);
             this.groupBox_CameraImformation.ResumeLayout(false);
             this.groupBox_CameraImformation.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown_Exposure)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown_Gain)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown_FPS)).EndInit();
             this.ResumeLayout(false);
 
         }
 
         #endregion
 
-        public System.Windows.Forms.Button button_Test001;
         public System.Windows.Forms.Label label_Exposure;
         public System.Windows.Forms.Label label_FPS;
         public System.Windows.Forms.Label label_Gain;
@@ -204,8 +138,5 @@
         public System.Windows.Forms.Label label_GainValue;
         public System.Windows.Forms.Label label_ExposureValue;
         public System.Windows.Forms.GroupBox groupBox_CameraImformation;
-        public System.Windows.Forms.NumericUpDown numericUpDown_Exposure;
-        public System.Windows.Forms.NumericUpDown numericUpDown_FPS;
-        public System.Windows.Forms.NumericUpDown numericUpDown_Gain;
     }
 }

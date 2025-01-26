@@ -21,7 +21,6 @@ Class CameraSetting.UserControlOfCameraSetting: AutoLayout, AnsiClass, Class, Pu
   :System.Windows.Forms.UserControl
     Void .ctor(): PrivateScope, Public, HideBySig, SpecialName, RTSpecialName
   Fields:
-    System.Windows.Forms.Button button_Test001 : Public
     System.Windows.Forms.Label label_Exposure : Public
     System.Windows.Forms.Label label_FPS : Public
     System.Windows.Forms.Label label_Gain : Public
@@ -29,9 +28,6 @@ Class CameraSetting.UserControlOfCameraSetting: AutoLayout, AnsiClass, Class, Pu
     System.Windows.Forms.Label label_GainValue : Public
     System.Windows.Forms.Label label_ExposureValue : Public
     System.Windows.Forms.GroupBox groupBox_CameraImformation : Public
-    System.Windows.Forms.NumericUpDown numericUpDown_Exposure : Public
-    System.Windows.Forms.NumericUpDown numericUpDown_FPS : Public
-    System.Windows.Forms.NumericUpDown numericUpDown_Gain : Public
   Events:
     CameraSetting.ButtonClickEventHandler ButtonShotClickEvent: 
   Methods:
