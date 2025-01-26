@@ -1,4 +1,3 @@
-  ImageProcessing.LoginForm.resources - Embedded, ContainedInManifestFile, 
   ImageProcessing.MyForm.resources - Embedded, ContainedInManifestFile, 
 ImageRuntimeVersion: v4.0.30319
 Assembly ImageProcessing, Version=0.0.*, Culture=不因語言而異 (不因國別而異): 
@@ -17,19 +16,6 @@ Assembly System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=
 	hash=None, flags=None
 Assembly System.Xml, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089: 
 	hash=None, flags=None
-Class UI.LoginForm: AutoLayout, AnsiClass, Class, Public, BeforeFieldInit
-  :System.Windows.Forms.Form
-    Void .ctor(): PrivateScope, Public, HideBySig, SpecialName, RTSpecialName
-  Fields:
-    UI.LoginState state : Public
-Struct UI.LoginState: AutoLayout, AnsiClass, Class, Public, Sealed, BeforeFieldInit
-  :System.Enum
-  Fields:
-    Int32 value__ : Public, SpecialName, RTSpecialName
-    UI.LoginState NoLogin = 0 : Public, Static, Literal, HasDefault
-    UI.LoginState LoginAsUser = 1 : Public, Static, Literal, HasDefault
-    UI.LoginState LoginAsPM = 2 : Public, Static, Literal, HasDefault
-    UI.LoginState LoginAsSW = 3 : Public, Static, Literal, HasDefault
 Class UI.MyForm: AutoLayout, AnsiClass, Class, Public, BeforeFieldInit
   :System.Windows.Forms.Form
     Void .ctor(): PrivateScope, Public, HideBySig, SpecialName, RTSpecialName

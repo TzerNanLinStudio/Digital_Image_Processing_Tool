@@ -1,3 +1,0 @@
-﻿C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\MSBuild\Microsoft\VC\v160\Microsoft.CppBuild.targets(513,5): warning MSB8028: 中繼目錄 (x64\Debug\) 包含從其他專案 (AOI.vcxproj) 共用的檔案。這可能導致錯誤的清除和重建行為。
-C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\MSBuild\Current\Bin\Microsoft.Common.CurrentVersion.targets(2827,5): warning MSB3290: 無法建立類型程式庫 "{bee4bfec-6683-3e67-9167-3c0cbc68f40a}" 的包裝函式組件。已從 CLR 組件匯出類型程式庫 'System'，且不能再當做 CLR 組件匯入。
-  Demo.vcxproj -> C:\Users\goodc\OneDrive\Desktop\Git\Digital_Image_Processing_and_Analysis_Tool\PyrOptik\CPlusPlus\x64\Debug\Demo.exe
