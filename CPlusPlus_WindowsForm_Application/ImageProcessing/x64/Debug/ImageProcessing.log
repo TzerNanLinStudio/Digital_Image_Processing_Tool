@@ -26,6 +26,7 @@ C:\Users\goodc\OneDrive\Desktop\Git\Digital_Image_Processing_and_Analysis_Tool\C
   UI.cpp
   Notice: Using GenICam with untested compiler, version 1929 detected!
   Following versions were tested: 1400, 1500, 1600, 1700, 1800, 1900.
+  .NETFramework,Version=v4.6.1.AssemblyAttributes.cpp
   正在產生程式碼...
 C:\opencv\build\include\opencv2\core\cvstd.hpp(575): warning C4793: 'cv::String::String': 函式會編譯成機器碼:
   	找到受控碼中不支援的內建
@@ -83,5 +84,5 @@ C:\Program Files\OMRON_SENTECH\SentechSDK\Development\Include\GenICam\Base\GCExc
   	在 /clr 下不支援 varargs
 C:\Program Files\OMRON_SENTECH\SentechSDK\Development\Include\GenICam\Base\GCException.h(188): warning C4793: 'GenICam_3_0_Sentech::ExceptionReporter<GenICam_3_0_Sentech::AccessException>::Report': 函式會編譯成機器碼:
   	找到受控碼中不支援的內建
-  LoginForm.obj : 發現 MSIL 模組。MSIL 的累加連結已停用。正在執行完整連結
+  MyForm.obj : 發現 MSIL 模組。MSIL 的累加連結已停用。正在執行完整連結
   ImageProcessing.vcxproj -> C:\Users\goodc\OneDrive\Desktop\Git\Digital_Image_Processing_and_Analysis_Tool\CPlusPlus_WindowsForm_Application\x64\Debug\ImageProcessing.exe

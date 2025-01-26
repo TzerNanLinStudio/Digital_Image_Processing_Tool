@@ -15,7 +15,6 @@
 #include <msclr/marshal.h>
 #include <StApi_TL.h>
 #include <StApi_GUI.h>
-#include "LoginForm.h"
 
 #define Mode_Of_Debug 0
 #define Mode_Of_Solution 0;
@@ -142,6 +141,7 @@ namespace UI
 		void InitializeComponent(void)
 		{
 			this->components = (gcnew System::ComponentModel::Container());
+			System::ComponentModel::ComponentResourceManager^ resources = (gcnew System::ComponentModel::ComponentResourceManager(MyForm::typeid));
 			this->pictureBox_ShowImage = (gcnew System::Windows::Forms::PictureBox());
 			this->button_Gray = (gcnew System::Windows::Forms::Button());
 			this->numericUpDown_Threshold = (gcnew System::Windows::Forms::NumericUpDown());

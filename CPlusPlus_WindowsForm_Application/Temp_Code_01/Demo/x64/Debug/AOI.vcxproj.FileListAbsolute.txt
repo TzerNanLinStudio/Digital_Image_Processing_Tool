@@ -1,6 +1,0 @@
-D:\Project\OldReference\AOI_2\AOI\x64\Debug\AOI.vcxproj.ResolveComReference.cache
-D:\Project\OldReference\AOI_2\AOI\x64\Debug\AOI.MainForm.resources
-D:\Project\OldReference\AOI_2\AOI\x64\Debug\AOI.vcxproj.GenerateResource.cache
-C:\Users\goodc\OneDrive\Desktop\Git\PyrOptik\AOI_2\AOI\x64\Debug\AOI.vcxproj.ResolveComReference.cache
-C:\Users\goodc\OneDrive\Desktop\Git\PyrOptik\AOI_2\AOI\x64\Debug\AOI.MainForm.resources
-C:\Users\goodc\OneDrive\Desktop\Git\PyrOptik\AOI_2\AOI\x64\Debug\AOI.vcxproj.GenerateResource.cache
