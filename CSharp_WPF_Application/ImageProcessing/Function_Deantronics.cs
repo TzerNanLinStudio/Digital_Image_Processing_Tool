@@ -10,15 +10,16 @@ using System.Threading.Tasks;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
+using System.Data.SqlClient;
+using System.Windows.Controls;
 using Emgu.CV.Flann;
 using Emgu.CV.OCR;
 using Emgu.CV;
 using Emgu.CV.Structure;
 using Emgu.CV.Util;
 using Emgu.CV.CvEnum;
-using Config_sharp;
-using System.Data.SqlClient;
-using System.Windows.Controls;
+using Config;
+using LOGRECORDER;
 
 namespace ImageProcessing
 {

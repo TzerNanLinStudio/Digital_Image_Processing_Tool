@@ -1,0 +1,85 @@
+﻿<Window x:Class="UI.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:UI"
+        xmlns:emgu="clr-namespace:Emgu.CV.UI;assembly=Emgu.CV.UI"
+        xmlns:wf="clr-namespace:System.Windows.Forms;assembly=System.Windows.Forms"      
+        mc:Ignorable="d"
+        FontSize="12"
+        FontFamily="Microsoft JhengHei"
+        Background="SkyBlue"
+        Icon="/UI/Icon.ico"
+        WindowStartupLocation="CenterScreen"
+        Title="Image Processing and Analysis" Height="400.0" Width="700.0" Closing="MainWindow_Closing">
+
+    <Control.Resources>
+        <Style x:Key="buttonHover" TargetType="Button">
+            <Setter Property="Background" Value="#8a8c8e"/>
+            <Setter Property="Foreground" Value="Black"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Name="border" Background="{TemplateBinding Background}" BorderThickness="3" BorderBrush="Black" CornerRadius="3">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="Button.IsPressed" Value="True">
+                                <Setter TargetName="border" Property="BorderThickness" Value="5" />
+                            </Trigger>
+                            <Trigger Property="Button.IsPressed" Value="True">
+                                <Setter Property="Background" Value="#d3d7d4"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Control.Resources>
+
+    <Grid KeyDown="OnKeyDownHandler">
+        <Border BorderBrush="Black" BorderThickness="1" HorizontalAlignment="Left" Height="178" Margin="10,658,0,0" VerticalAlignment="Top" Width="330" Background="Red" Visibility="Hidden"/>
+        <Border BorderBrush="Black" BorderThickness="1" HorizontalAlignment="Left" Height="178" Margin="345,658,0,0" VerticalAlignment="Top" Width="330" Background="Red" Visibility="Hidden"/>
+        <Border BorderBrush="Black" BorderThickness="1" HorizontalAlignment="Left" Height="178" Margin="680,658,0,0" VerticalAlignment="Top" Width="330" Background="Red" Visibility="Hidden"/>
+        <RichTextBox x:Name="RichTextBox_GeneralLog" IsReadOnly="True" Height="60" Width="360" Margin="10,280,322,29"/>
+        <Button x:Name="Btn_F_Item01_ROI" HorizontalAlignment="Left" Margin="470,95,0,0" VerticalAlignment="Top" Width="90" Height="60" RenderTransformOrigin="0.507,0.435" Click="Btn_F_ROI_Click" Style="{StaticResource buttonHover}">
+            <StackPanel Orientation="Horizontal">
+                <Image x:Name="Image_F_ROI" Source="/UI/SetROI.ico" Height="12"/>
+                <TextBlock x:Name="TextBlock_F_ROI" Text=" 設定ROI"/>
+            </StackPanel>
+        </Button>
+        <RadioButton x:Name="RadioButton_F_Item01_ROI01" Content="ROI" HorizontalAlignment="Left" Margin="375,10,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.279,0.398" Checked="RadioButton_FirstStation_Checked"/>
+        <WindowsFormsHost x:Name="DisplayWindow_First" Height="270" Width="360" RenderTransformOrigin="0.497,0.484" Margin="10,10,322,89">
+            <emgu:ImageBox x:Name="ImageBox_FirstStation" Visible="True" SizeMode="Zoom" FunctionalMode="Minimum" BackColor="Black"
+                                       Paint="ImageBox_FirstStation_Paint" 
+                                       MouseDown="ImageBox_FirstStation_MouseDown" 
+                                       MouseUp="ImageBox_FirstStation_MouseUp" 
+                                       MouseMove="ImageBox_FirstStation_MouseMove"/>
+        </WindowsFormsHost>
+        <Button x:Name="Btn_F_Item01_IP" HorizontalAlignment="Left" Margin="375,160,0,0" VerticalAlignment="Top" Width="90" Height="60" Click="Btn_F_IP_Click" RenderTransformOrigin="0.507,0.435" Style="{StaticResource buttonHover}">
+            <StackPanel Orientation="Horizontal">
+                <Image x:Name="Image_F_Item01_IP" Source="/UI/IP.ico" Height="12"/>
+                <TextBlock x:Name="TextBlock_F_Item01_IP" Text=" 影像處理"/>
+            </StackPanel>
+        </Button>
+        <Button x:Name="Btn_F_Save" HorizontalAlignment="Left" Margin="470,30,0,0" VerticalAlignment="Top" Width="90" Height="60" RenderTransformOrigin="0.506,0.518" Click="Btn_F_Save_Click" Style="{StaticResource buttonHover}">
+            <StackPanel Orientation="Horizontal">
+                <Image x:Name="Image_F_Save" Source="/UI/SaveImage.ico" Height="12"/>
+                <TextBlock x:Name="TextBlock_F_Save" Text=" 儲存影像"/>
+            </StackPanel>
+        </Button>
+        <Button Width="90" VerticalAlignment="Top" Style="{StaticResource buttonHover}" RenderTransformOrigin="0.657,-1.434" x:Name="Btn_F_Open" Margin="375,30,0,0" Height="60" HorizontalAlignment="Left" Click="Btn_F_Open_Click">
+            <StackPanel Orientation="Horizontal">
+                <Image Height="12" x:Name="Image_F_Open" Source="/UI/OpenImage.ico"/>
+                <TextBlock x:Name="TextBlock_F_Open" Text=" 開啟影像"/>
+            </StackPanel>
+        </Button>
+        <Button Width="90" VerticalAlignment="Top" Style="{StaticResource buttonHover}" RenderTransformOrigin="0.632,2.356" x:Name="Btn_F_Origin" Margin="375,95,0,0" Height="60" HorizontalAlignment="Left" Click="Btn_F_Origin_Click">
+            <StackPanel  Orientation="Horizontal">
+                <Image Height="12" x:Name="Image_F_Origin" Source="/UI/OriginImage.ico"/>
+                <TextBlock x:Name="TextBlock_F_Origin" Text=" 恢復原圖"/>
+            </StackPanel>
+        </Button>
+    </Grid>
+</Window>
