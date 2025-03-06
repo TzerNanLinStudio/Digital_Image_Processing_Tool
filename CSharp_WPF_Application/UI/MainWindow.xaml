@@ -10,7 +10,6 @@
         FontSize="12"
         FontFamily="Microsoft JhengHei"
         Background="SkyBlue"
-        Icon="/UI/Icon.ico"
         WindowStartupLocation="CenterScreen"
         Title="Image Processing and Analysis" Height="400.0" Width="700.0" Closing="MainWindow_Closing">
 
@@ -45,7 +44,7 @@
         <RichTextBox x:Name="RichTextBox_GeneralLog" IsReadOnly="True" Height="60" Width="360" Margin="10,280,322,29"/>
         <Button x:Name="Btn_F_Item01_ROI" HorizontalAlignment="Left" Margin="470,95,0,0" VerticalAlignment="Top" Width="90" Height="60" RenderTransformOrigin="0.507,0.435" Click="Btn_F_ROI_Click" Style="{StaticResource buttonHover}">
             <StackPanel Orientation="Horizontal">
-                <Image x:Name="Image_F_ROI" Source="/UI/SetROI.ico" Height="12"/>
+                <Image x:Name="Image_F_ROI" Source="/Icon/SetROI.ico" Height="12"/>
                 <TextBlock x:Name="TextBlock_F_ROI" Text=" 設定ROI"/>
             </StackPanel>
         </Button>
@@ -59,27 +58,28 @@
         </WindowsFormsHost>
         <Button x:Name="Btn_F_Item01_IP" HorizontalAlignment="Left" Margin="375,160,0,0" VerticalAlignment="Top" Width="90" Height="60" Click="Btn_F_IP_Click" RenderTransformOrigin="0.507,0.435" Style="{StaticResource buttonHover}">
             <StackPanel Orientation="Horizontal">
-                <Image x:Name="Image_F_Item01_IP" Source="/UI/IP.ico" Height="12"/>
+                <Image x:Name="Image_F_Item01_IP" Source="/Icon/IP.ico" Height="12"/>
                 <TextBlock x:Name="TextBlock_F_Item01_IP" Text=" 影像處理"/>
             </StackPanel>
         </Button>
         <Button x:Name="Btn_F_Save" HorizontalAlignment="Left" Margin="470,30,0,0" VerticalAlignment="Top" Width="90" Height="60" RenderTransformOrigin="0.506,0.518" Click="Btn_F_Save_Click" Style="{StaticResource buttonHover}">
             <StackPanel Orientation="Horizontal">
-                <Image x:Name="Image_F_Save" Source="/UI/SaveImage.ico" Height="12"/>
+                <Image x:Name="Image_F_Save" Source="/Icon/SaveImage.ico" Height="12"/>
                 <TextBlock x:Name="TextBlock_F_Save" Text=" 儲存影像"/>
             </StackPanel>
         </Button>
         <Button Width="90" VerticalAlignment="Top" Style="{StaticResource buttonHover}" RenderTransformOrigin="0.657,-1.434" x:Name="Btn_F_Open" Margin="375,30,0,0" Height="60" HorizontalAlignment="Left" Click="Btn_F_Open_Click">
             <StackPanel Orientation="Horizontal">
-                <Image Height="12" x:Name="Image_F_Open" Source="/UI/OpenImage.ico"/>
+                <Image Height="12" x:Name="Image_F_Open" Source="/Icon/OpenImage.ico"/>
                 <TextBlock x:Name="TextBlock_F_Open" Text=" 開啟影像"/>
             </StackPanel>
         </Button>
         <Button Width="90" VerticalAlignment="Top" Style="{StaticResource buttonHover}" RenderTransformOrigin="0.632,2.356" x:Name="Btn_F_Origin" Margin="375,95,0,0" Height="60" HorizontalAlignment="Left" Click="Btn_F_Origin_Click">
             <StackPanel  Orientation="Horizontal">
-                <Image Height="12" x:Name="Image_F_Origin" Source="/UI/OriginImage.ico"/>
+                <Image Height="12" x:Name="Image_F_Origin" Source="/Icon/OriginImage.ico"/>
                 <TextBlock x:Name="TextBlock_F_Origin" Text=" 恢復原圖"/>
             </StackPanel>
         </Button>
+        <local:Filter Width="90" Height="90" Margin="75,90,-75,-90"/>
     </Grid>
 </Window>

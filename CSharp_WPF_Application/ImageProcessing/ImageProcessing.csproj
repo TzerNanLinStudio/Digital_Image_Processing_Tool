@@ -125,10 +125,6 @@
       <Project>{60c16fc7-afa4-478a-b76f-1c7e9b04342b}</Project>
       <Name>Config</Name>
     </ProjectReference>
-    <ProjectReference Include="..\LogRecorder\LogRecorder.vcxproj">
-      <Project>{7662a689-1b73-464a-a98f-13bb336cdcf3}</Project>
-      <Name>LogRecorder</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\EMGU.CV.4.1.1.3497\build\EMGU.CV.targets" Condition="Exists('..\packages\EMGU.CV.4.1.1.3497\build\EMGU.CV.targets')" />

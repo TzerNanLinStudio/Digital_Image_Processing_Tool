@@ -29,7 +29,7 @@ using Emgu.CV.Structure;
 using Emgu.CV.CvEnum;
 using ImageProcessing;
 using Config;
-using LOGRECORDER;
+//using LOGRECORDER;
 
 namespace UI
 {

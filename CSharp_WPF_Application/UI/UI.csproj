@@ -6,8 +6,8 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{599FD083-238F-4A99-B02B-91EAE6AEDB5E}</ProjectGuid>
     <OutputType>Exe</OutputType>
-    <RootNamespace>AOI_UI</RootNamespace>
-    <AssemblyName>AOI_UI</AssemblyName>
+    <RootNamespace>UI</RootNamespace>
+    <AssemblyName>UI</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
@@ -120,9 +120,19 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Filter.xaml.cs">
+      <DependentUpon>Filter.xaml</DependentUpon>
+    </Compile>
     <Compile Include="OffsetSetting.xaml.cs">
       <DependentUpon>OffsetSetting.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Square.xaml.cs">
+      <DependentUpon>Square.xaml</DependentUpon>
+    </Compile>
+    <Page Include="Filter.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -138,6 +148,10 @@
     <Page Include="OffsetSetting.xaml">
       <SubType>Designer</SubType>
       <Generator>XamlIntelliSenseFileGenerator</Generator>
+    </Page>
+    <Page Include="Square.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
   <ItemGroup>
@@ -179,10 +193,6 @@
       <Project>{34e79f33-72e4-42bb-9707-fff21ad849ea}</Project>
       <Name>ImageProcessing</Name>
     </ProjectReference>
-    <ProjectReference Include="..\LogRecorder\LogRecorder.vcxproj">
-      <Project>{7662a689-1b73-464a-a98f-13bb336cdcf3}</Project>
-      <Name>LogRecorder</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.7.2">
@@ -197,65 +207,65 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="UI\SaveImage.ico" />
+    <Resource Include="Icon\SaveImage.ico" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="UI\SaveParameter.ico" />
+    <Resource Include="Icon\SaveParameter.ico" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="UI\GrabImage.ico" />
-    <Resource Include="UI\OpenImage.ico" />
-    <Resource Include="UI\OriginImage.ico" />
+    <Resource Include="Icon\GrabImage.ico" />
+    <Resource Include="Icon\OpenImage.ico" />
+    <Resource Include="Icon\OriginImage.ico" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="UI\IP.ico" />
+    <Resource Include="Icon\IP.ico" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="UI\SetROI.ico" />
+    <Resource Include="Icon\SetROI.ico" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="UI\SaveSample.ico" />
+    <Resource Include="Icon\SaveSample.ico" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="UI\StartAOI.ico" />
-    <Resource Include="UI\StopAOI.ico" />
+    <Resource Include="Icon\StartAOI.ico" />
+    <Resource Include="Icon\StopAOI.ico" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="UI\NetworkOff.ico" />
-    <Resource Include="UI\NetworkOn.ico" />
+    <Resource Include="Icon\NetworkOff.ico" />
+    <Resource Include="Icon\NetworkOn.ico" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="UI\Lock.ico" />
+    <Resource Include="Icon\Lock.ico" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="UI\Unlock.ico" />
+    <Resource Include="Icon\Unlock.ico" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="UI\CloseWindow.ico" />
+    <Resource Include="Icon\CloseWindow.ico" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="UI\Icon.ico" />
+    <Resource Include="Icon\Icon.ico" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="UI\MSMLogo.png" />
+    <Resource Include="Icon\MSMLogo.png" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="UI\DWLogo.jpg" />
+    <Resource Include="Icon\DWLogo.jpg" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="UI\TrashCan.ico" />
+    <Resource Include="Icon\TrashCan.ico" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Icon.ico" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="UI\GreenSign.ico" />
+    <Resource Include="Icon\GreenSign.ico" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="UI\RedSign.ico" />
+    <Resource Include="Icon\RedSign.ico" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="UI\YellowSign.ico" />
+    <Resource Include="Icon\YellowSign.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\EMGU.CV.4.1.1.3497\build\EMGU.CV.targets" Condition="Exists('..\packages\EMGU.CV.4.1.1.3497\build\EMGU.CV.targets')" />

@@ -326,7 +326,7 @@ namespace AOI_UI {
                 return;
             }
             _contentLoaded = true;
-            System.Uri resourceLocater = new System.Uri("/AOI_UI;component/offsetsetting.xaml", System.UriKind.Relative);
+            System.Uri resourceLocater = new System.Uri("/UI;component/offsetsetting.xaml", System.UriKind.Relative);
             
             #line 1 "..\..\..\OffsetSetting.xaml"
             System.Windows.Application.LoadComponent(this, resourceLocater);

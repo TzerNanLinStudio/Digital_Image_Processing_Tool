@@ -19,7 +19,7 @@ using Emgu.CV.Structure;
 using Emgu.CV.Util;
 using Emgu.CV.CvEnum;
 using Config;
-using LOGRECORDER;
+//using LOGRECORDER;
 
 namespace ImageProcessing
 {
