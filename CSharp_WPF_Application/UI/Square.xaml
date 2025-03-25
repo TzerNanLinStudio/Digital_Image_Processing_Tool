@@ -23,7 +23,6 @@
 
         <Border x:Name="Border_Main"  Grid.Column="1" Grid.Row="1" Background="Gray" x:FieldModifier="public">
             <Grid>
-                <!-- 顯示數值的 TextBlock -->
                 <TextBlock x:Name="Text_Number" Text="0" 
                                    Foreground="White" 
                                    HorizontalAlignment="Center" 
@@ -31,8 +30,6 @@
                                    FontSize="14"
                                    x:FieldModifier="public"
                                    MouseLeftButtonDown="Text_Number_MouseLeftButtonDown"/>
-
-                <!-- 可編輯的 TextBox（預設隱藏） -->
                 <TextBox x:Name="TextBox_Number" Visibility="Collapsed"
                                  HorizontalAlignment="Center"
                                  VerticalAlignment="Center"

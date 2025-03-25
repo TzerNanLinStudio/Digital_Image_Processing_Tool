@@ -11,7 +11,7 @@
         FontFamily="Microsoft JhengHei"
         Background="SkyBlue"
         WindowStartupLocation="CenterScreen"
-        Title="Image Processing and Analysis" Height="400.0" Width="700.0" Closing="MainWindow_Closing">
+        Title="Image Processing and Analysis" Height="420.0" Width="700.0" Closing="MainWindow_Closing">
 
     <Control.Resources>
         <Style x:Key="buttonHover" TargetType="Button">
@@ -38,48 +38,110 @@
     </Control.Resources>
 
     <Grid KeyDown="OnKeyDownHandler">
-        <Border BorderBrush="Black" BorderThickness="1" HorizontalAlignment="Left" Height="178" Margin="10,658,0,0" VerticalAlignment="Top" Width="330" Background="Red" Visibility="Hidden"/>
-        <Border BorderBrush="Black" BorderThickness="1" HorizontalAlignment="Left" Height="178" Margin="345,658,0,0" VerticalAlignment="Top" Width="330" Background="Red" Visibility="Hidden"/>
-        <Border BorderBrush="Black" BorderThickness="1" HorizontalAlignment="Left" Height="178" Margin="680,658,0,0" VerticalAlignment="Top" Width="330" Background="Red" Visibility="Hidden"/>
-        <RichTextBox x:Name="RichTextBox_GeneralLog" IsReadOnly="True" Height="60" Width="360" Margin="10,280,322,29"/>
-        <Button x:Name="Btn_F_Item01_ROI" HorizontalAlignment="Left" Margin="470,95,0,0" VerticalAlignment="Top" Width="90" Height="60" RenderTransformOrigin="0.507,0.435" Click="Btn_F_ROI_Click" Style="{StaticResource buttonHover}">
-            <StackPanel Orientation="Horizontal">
-                <Image x:Name="Image_F_ROI" Source="/Icon/SetROI.ico" Height="12"/>
-                <TextBlock x:Name="TextBlock_F_ROI" Text=" 設定ROI"/>
+        <StackPanel Orientation="Horizontal">
+            <StackPanel Orientation="Vertical">
+                <WindowsFormsHost Height="270" Width="360" >
+                    <emgu:ImageBox x:Name="ImageBox_Main" Visible="True" SizeMode="Zoom" FunctionalMode="Minimum" BackColor="Black"
+                                       Paint="ImageBox_Paint" 
+                                       MouseDown="ImageBox_MouseDown" 
+                                       MouseUp="ImageBox_MouseUp" 
+                                       MouseMove="ImageBox_MouseMove"/>
+                </WindowsFormsHost>
+                <RichTextBox x:Name="RichTextBox_GeneralLog" IsReadOnly="True" Height="110" Width="360"/>
             </StackPanel>
-        </Button>
-        <RadioButton x:Name="RadioButton_F_Item01_ROI01" Content="ROI" HorizontalAlignment="Left" Margin="375,10,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.279,0.398" Checked="RadioButton_FirstStation_Checked"/>
-        <WindowsFormsHost x:Name="DisplayWindow_First" Height="270" Width="360" RenderTransformOrigin="0.497,0.484" Margin="10,10,322,89">
-            <emgu:ImageBox x:Name="ImageBox_FirstStation" Visible="True" SizeMode="Zoom" FunctionalMode="Minimum" BackColor="Black"
-                                       Paint="ImageBox_FirstStation_Paint" 
-                                       MouseDown="ImageBox_FirstStation_MouseDown" 
-                                       MouseUp="ImageBox_FirstStation_MouseUp" 
-                                       MouseMove="ImageBox_FirstStation_MouseMove"/>
-        </WindowsFormsHost>
-        <Button x:Name="Btn_F_Item01_IP" HorizontalAlignment="Left" Margin="375,160,0,0" VerticalAlignment="Top" Width="90" Height="60" Click="Btn_F_IP_Click" RenderTransformOrigin="0.507,0.435" Style="{StaticResource buttonHover}">
-            <StackPanel Orientation="Horizontal">
-                <Image x:Name="Image_F_Item01_IP" Source="/Icon/IP.ico" Height="12"/>
-                <TextBlock x:Name="TextBlock_F_Item01_IP" Text=" 影像處理"/>
+            <StackPanel Orientation="Vertical">
+                <Border Background="SkyBlue" BorderBrush="Black" BorderThickness="1,1,1,0" Padding="5,5,5,5">
+                        <local:Buffer x:Name="Buffer_x12"/>
+                    </Border>
+                <Border Background="SkyBlue" BorderBrush="Black" BorderThickness="1,0,1,1" Padding="5,5,5,5">
+                    <StackPanel Orientation="Vertical">
+                        <Button  x:Name="Btn_Open" Width="100" Height="30" Click="Btn_Click" Style="{StaticResource buttonHover}">
+                            <StackPanel Orientation="Horizontal">
+                                <Image Height="12" x:Name="Image_Open" Source="/Icon/OpenImage.ico"/>
+                                <TextBlock x:Name="TextBlock_Open" Text=" Open"/>
+                            </StackPanel>
+                        </Button>
+                        <Button x:Name="Btn_Save" Width="100" Height="30" Click="Btn_Click" Style="{StaticResource buttonHover}">
+                            <StackPanel Orientation="Horizontal">
+                                <Image x:Name="Image_Save" Source="/Icon/SaveImage.ico" Height="12"/>
+                                <TextBlock x:Name="TextBlock_Save" Text=" Save"/>
+                            </StackPanel>
+                        </Button>
+                        <Button x:Name="Btn_Copy" Width="100" Height="30" Click="Btn_Click" Style="{StaticResource buttonHover}">
+                            <StackPanel Orientation="Horizontal">
+                                <Image x:Name="Image_Copy" Source="/Icon/SaveImage.ico" Height="12"/>
+                                <TextBlock x:Name="TextBlock_Copy" Text=" Copy"/>
+                            </StackPanel>
+                        </Button>
+                        <Button x:Name="Btn_Delete" Width="100" Height="30" Click="Btn_Click" Style="{StaticResource buttonHover}">
+                            <StackPanel Orientation="Horizontal">
+                                <Image x:Name="Image_Delete" Source="/Icon/SaveImage.ico" Height="12"/>
+                                <TextBlock x:Name="TextBlock_Delete" Text=" Delete"/>
+                            </StackPanel>
+                        </Button>
+                    </StackPanel>
+                </Border>
             </StackPanel>
-        </Button>
-        <Button x:Name="Btn_F_Save" HorizontalAlignment="Left" Margin="470,30,0,0" VerticalAlignment="Top" Width="90" Height="60" RenderTransformOrigin="0.506,0.518" Click="Btn_F_Save_Click" Style="{StaticResource buttonHover}">
-            <StackPanel Orientation="Horizontal">
-                <Image x:Name="Image_F_Save" Source="/Icon/SaveImage.ico" Height="12"/>
-                <TextBlock x:Name="TextBlock_F_Save" Text=" 儲存影像"/>
+            <StackPanel Orientation="Vertical">
+                <StackPanel Orientation="Horizontal">
+                    <StackPanel Orientation="Vertical">
+
+                    </StackPanel>
+                    <StackPanel Orientation="Vertical">
+                        <Border Background="SkyBlue" BorderBrush="Black" BorderThickness="1" Padding="5,5,5,5">
+                            <StackPanel Orientation="Vertical">
+                                <TextBlock Text="Filter" TextAlignment="Center"/>
+                                <local:Filter x:Name="Filter_3x3"/>
+                            </StackPanel>
+                        </Border>
+                        <Border Background="SkyBlue" BorderBrush="Black" BorderThickness="1" Padding="5,5,5,5">
+                            <StackPanel Orientation="Vertical">
+                                <TextBlock Text="Binarization" TextAlignment="Center"/>
+                                <Slider x:Name="Slide_Binarization" Minimum="0" Maximum="255" ValueChanged="Slide_ValueChanged" MouseRightButtonDown="Slide_MouseRightButtonDown" ToolTip="Right-click to Confirm"/>
+                            </StackPanel>
+                        </Border>
+                        <Border Background="SkyBlue" BorderBrush="Black" BorderThickness="1" Padding="5,5,5,5">
+                            <StackPanel Orientation="Vertical">
+                                <Button x:Name="Btn_Gray" Width="100" Height="30" Click="Btn_Click" Style="{StaticResource buttonHover}">
+                                    <StackPanel Orientation="Horizontal">
+                                        <Image x:Name="Image_Gray" Source="Icon/Start.ico" Height="12"/>
+                                        <TextBlock x:Name="TextBlock_Gray" Text=" Gray"/>
+                                    </StackPanel>
+                                </Button>
+                                <Button x:Name="Btn_Erosion" Width="100" Height="30" Click="Btn_Click" Style="{StaticResource buttonHover}">
+                                    <StackPanel Orientation="Horizontal">
+                                        <Image x:Name="Image_Erosion" Source="/Icon/Start.ico" Height="12"/>
+                                        <TextBlock x:Name="TextBlock_Erosion" Text=" Erosion"/>
+                                    </StackPanel>
+                                </Button>
+                                <Button x:Name="Btn_Dilation" Width="100" Height="30" Click="Btn_Click" Style="{StaticResource buttonHover}">
+                                    <StackPanel Orientation="Horizontal">
+                                        <Image x:Name="Image_Dilation" Source="/Icon/Start.ico" Height="12"/>
+                                        <TextBlock x:Name="TextBlock_Dilation" Text=" Dilation"/>
+                                    </StackPanel>
+                                </Button>
+                                <Button x:Name="Btn_ROI"  Width="100" Height="30" Click="Btn_Click" Style="{StaticResource buttonHover}">
+                                    <StackPanel Orientation="Horizontal">
+                                        <Image x:Name="Image_ROI" Source="/Icon/SetROI.ico" Height="12"/>
+                                        <TextBlock x:Name="TextBlock_ROI" Text=" ROI"/>
+                                    </StackPanel>
+                                </Button>
+                            </StackPanel>
+                        </Border>
+                        <Button x:Name="Btn_Reset" Width="110" Height="85" Click="Btn_Click" Style="{StaticResource buttonHover}">
+                            <StackPanel Orientation="Horizontal">
+                                <Image x:Name="Image_Reset" Source="/Icon/Reset.ico" Height="12"/>
+                                <TextBlock x:Name="TextBlock_Reset" Text=" Reset"/>
+                            </StackPanel>
+                        </Button>
+                    </StackPanel>
+                    <StackPanel Orientation="Vertical">
+                        
+                        <Button x:Name="test1" Click="Btn_Click" Width="40" Height="40"/>
+                        <Button x:Name="test2" Click="Btn_Click" Width="40" Height="40"/>
+                    </StackPanel>
+                </StackPanel>
             </StackPanel>
-        </Button>
-        <Button Width="90" VerticalAlignment="Top" Style="{StaticResource buttonHover}" RenderTransformOrigin="0.657,-1.434" x:Name="Btn_F_Open" Margin="375,30,0,0" Height="60" HorizontalAlignment="Left" Click="Btn_F_Open_Click">
-            <StackPanel Orientation="Horizontal">
-                <Image Height="12" x:Name="Image_F_Open" Source="/Icon/OpenImage.ico"/>
-                <TextBlock x:Name="TextBlock_F_Open" Text=" 開啟影像"/>
-            </StackPanel>
-        </Button>
-        <Button Width="90" VerticalAlignment="Top" Style="{StaticResource buttonHover}" RenderTransformOrigin="0.632,2.356" x:Name="Btn_F_Origin" Margin="375,95,0,0" Height="60" HorizontalAlignment="Left" Click="Btn_F_Origin_Click">
-            <StackPanel  Orientation="Horizontal">
-                <Image Height="12" x:Name="Image_F_Origin" Source="/Icon/OriginImage.ico"/>
-                <TextBlock x:Name="TextBlock_F_Origin" Text=" 恢復原圖"/>
-            </StackPanel>
-        </Button>
-        <local:Filter Width="90" Height="90" Margin="75,90,-75,-90"/>
+        </StackPanel>
     </Grid>
 </Window>

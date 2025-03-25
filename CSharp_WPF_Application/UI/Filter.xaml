@@ -8,27 +8,23 @@
              FontSize="12"
              FontFamily="Microsoft JhengHei"
              MinWidth="90" MaxWidth="90" MinHeight="90" MaxHeight="90">
-    
+
     <Grid Background="White">
-        <StackPanel Orientation="Horizontal">
-            <StackPanel Orientation="Vertical">
-                <StackPanel x:Name="StackPanel_FiveBox" Orientation="Horizontal">
-                    <StackPanel Orientation="Vertical">
-                        <local:Square/>
-                        <local:Square/>
-                        <local:Square/>
-                    </StackPanel>
-                    <StackPanel Orientation="Vertical">
-                        <local:Square/>
-                        <local:Square/>
-                        <local:Square/>
-                    </StackPanel>
-                    <StackPanel Orientation="Vertical">
-                        <local:Square/>
-                        <local:Square/>
-                        <local:Square/>
-                    </StackPanel>
-                </StackPanel>
+        <StackPanel x:Name="StackPanel_NineSquare" Orientation="Vertical" MouseRightButtonDown="StackPanel_NineSquare_MouseRightButtonDown"  ToolTip="Right-click to Confirm">
+            <StackPanel Orientation="Horizontal">
+                <local:Square/>
+                <local:Square/>
+                <local:Square/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal">
+                <local:Square/>
+                <local:Square/>
+                <local:Square/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal">
+                <local:Square/>
+                <local:Square/>
+                <local:Square/>
             </StackPanel>
         </StackPanel>
     </Grid>

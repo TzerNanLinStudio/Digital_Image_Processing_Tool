@@ -20,23 +20,27 @@ namespace UI
     /// </summary>
     public partial class Square : UserControl
     {
+        public delegate void NumberHandler(bool temp);
+        public event NumberHandler NumberHandleEvent;
+
         public Square()
         {
             InitializeComponent();
         }
 
-        // 失去焦點時，將 TextBox 內容更新到 TextBlock，並隱藏 TextBox
+        // When the TextBox loses focus, update the TextBlock content and hide the TextBox
         private void TextBox_Number_LostFocus(object sender, RoutedEventArgs e)
         {
-            UpdateNumber();
+            UpdateNumber(); 
         }
 
-        // 按下 Enter 鍵確認輸入，按下 Esc 鍵取消修改
+        // Handle Enter and Escape keys: Enter confirms input, Escape cancels the edit
         private void TextBox_Number_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.Enter)
             {
                 UpdateNumber();
+                NumberHandleEvent(true);
             }
             else if (e.Key == Key.Escape)
             {
@@ -45,17 +49,18 @@ namespace UI
             }
         }
 
-        // 更新數值並隱藏 TextBox
+        // Update the value and hide the TextBox
         private void UpdateNumber()
         {
             if (int.TryParse(TextBox_Number.Text, out int newValue))
             {
-                Text_Number.Text = newValue.ToString();
+                Text_Number.Text = newValue.ToString(); 
             }
             TextBox_Number.Visibility = Visibility.Collapsed;
-            Text_Number.Visibility = Visibility.Visible;
+            Text_Number.Visibility = Visibility.Visible; 
         }
 
+        // When the TextBlock is clicked, switch to the TextBox for editing
         private void Text_Number_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             TextBox_Number.Text = Text_Number.Text;

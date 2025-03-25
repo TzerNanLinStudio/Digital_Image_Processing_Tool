@@ -53,28 +53,14 @@ namespace UI
         IntPtr Hwnd = GetConsoleWindow();
         // --------------------------------------------------
 
-        //UI Parameter
+        // UI Parameter
         // --------------------------------------------------
-        public BitmapImage[] StatusSign = new BitmapImage[2];
-        public string[] StatusText = new string[6] { "Pass", "Fail", "Error", "ByPass", "", "00.00" };
-        public bool[] ControlIsEnableFlag = new bool[2] { true, true };
-        public bool[] SampleConfigFlag = new bool[3] { false, false, false };
-        public bool IsInitializationFlag = false;
-        public bool AOIRunFlag = false;
-        public bool VideoRunFlag = false;
-        public bool ROIChooseFlag = false;
-        public int[] ImageSource = new int[3] { -1, -1, -1 };
-        public int ROINumber = 0;
-        public int CenterNumber = 0;
+        public bool InitializationFlag = false;
         // --------------------------------------------------
 
         // Used For Picture Box Selection
         // --------------------------------------------------
-        public bool IsShowPixelValue = true;
         public bool IsMouseDown = false;
-
-        public int FirstPictureBox_ROILength = 0;
-        public int ThirdPictureBox_ROIWidth = 0;
 
         public bool Selecting = false;
         public System.Drawing.Rectangle rectPictureBox = System.Drawing.Rectangle.Empty;
@@ -82,27 +68,17 @@ namespace UI
         public System.Drawing.Point EndPoint_PictureBox;
         public System.Drawing.Point CenterPoint_PictureBox;
 
-        public bool SelectROI = false;
+        public bool SelectFlexibleROI = false;
+        public bool SelectFixedROI = false;
         public System.Drawing.Rectangle rectImageROI;
         public System.Drawing.Point ImageROI_StartPoint;
         public System.Drawing.Point ImageROI_EndPoint;
-
-        public bool[] SelectCenter = new bool[3] { false, false, false };
-        public System.Drawing.Point Image_CenterPoint;
-        // --------------------------------------------------
-
-        // Camera Parameter
-        // --------------------------------------------------
-        private static int CameraImageWidth = 2592;
-        private static int CameraImageHeight = 1944;
+        public System.Drawing.Point ImageROI_CenterPoint;
         // --------------------------------------------------
 
         // IP Parameter
         // --------------------------------------------------
-        public D_FirstStation FirstStationData;
-        private static Thread IP_1st;
-        public int[] ToIP = new int[3] { 0, 0, 0 };
-        public int[] ToPLC = new int[3] { 0, 0, 0 };
+
         // --------------------------------------------------
 
         // Other Parameter
@@ -113,48 +89,60 @@ namespace UI
 
         // Debug Parameter
         // --------------------------------------------------
-        public Stopwatch MyWatch01 = new Stopwatch();
-        public Stopwatch MyWatch02 = new Stopwatch();
-        public Stopwatch MyWatch03 = new Stopwatch();
         private static Thread DebugThread;
         public bool[] DebugFlag = new bool[5] { true, true, false, false, false };
-        public bool[] PrintFlag = new bool[5] { false, true, false, false, false };
+        public Stopwatch[] DebugWatch = new Stopwatch[5] { new Stopwatch(), new Stopwatch(), new Stopwatch(), new Stopwatch(), new Stopwatch() };
         // --------------------------------------------------
         #endregion
 
         public MainWindow()
         {
             InitializeComponent();
-            InitializeAOI();
+            InitializeUI();
         }
 
         #region "Event"
-        private void ImageRecord_ParameterEvent(bool t_CloseWindow, bool t_SaveConfig, bool t_ClearData, bool t_ChooseOrigin, bool t_ChooseResult, int t_Limit, int t_Rate)
+        private void Filter_Event(float[,] kernel, bool temp)
         {
             try
             {
-
+                if (temp)
+                {
+                    ImageBox_Main.Image = BasicAlgorithm.ToBGR(BasicAlgorithm.ApplyCustomFilter(BasicAlgorithm.ToGray(Buffer_x12.GetImage(Buffer_x12.CurrentIndex)), kernel));
+                }
+                else
+                {
+                    Buffer_x12.AddImage(Buffer_x12.VisibleCount, "Filter Image", BasicAlgorithm.ToBGR(BasicAlgorithm.ApplyCustomFilter(BasicAlgorithm.ToGray(Buffer_x12.GetImage(Buffer_x12.CurrentIndex)), kernel)));
+                    DoLog("完成濾波!", true, true, "General"); // todo
+                }
             }
             catch (Exception Ex)
             {
-                WriteLogOnUI("Error", "設定影像留存時發生異常!");
+                Console.WriteLine(Ex.Message); // todo
             }
         }
 
-        private void F_ResultReturn()
+        private void Buffer_Event(int index)
         {
-
+            try
+            {
+                ImageBox_Main.Image = Buffer_x12.GetImage(index);
+            }
+            catch (Exception Ex)
+            {
+                Console.WriteLine(Ex.Message); // todo
+            }
         }
         #endregion
 
         #region "Function"
-        private void InitializeAOI()
+        private void InitializeUI()
         {
             try
             {
                 if (true)
                 {
-                    IsInitializationFlag = true;
+                    InitializationFlag = false;
                     Console.WriteLine("====================================================================================================");
                     Console.WriteLine("====================================================================================================");
                     Console.WriteLine("====================================================================================================");
@@ -163,7 +151,10 @@ namespace UI
                 // 暫時紀錄代辦任務，完成後即可刪除
                 Console.WriteLine("使用config紀錄UI參數-如3*3filter設定，像是影像處裡或是UI");
                 Console.WriteLine("使用log，但是gitignore得忽視存下的檔案");
-                Console.WriteLine("灰階 二質化 3*3filter 膨脹 侵蝕  設定ROI");
+                Console.WriteLine("美化英文UI");
+                Console.WriteLine("完成基本英文註解");
+                Console.WriteLine("完成todo");
+                Console.WriteLine("清除不必要檔案");
 
                 // System Initialization Or Setting
                 // --------------------------------------------------
@@ -172,26 +163,14 @@ namespace UI
 
                 // IP Initialization Or Setting
                 // --------------------------------------------------
-                FirstStationData = new D_FirstStation();
-                FirstStationData.ResultHandlerEvent += F_ResultReturn;
-                FirstStationData.LogHandlerEvent += WriteLogOnUI;
 
-                IP_1st = new Thread(FirstStationData.DoInspection);
-                IP_1st.Start();
                 // --------------------------------------------------
 
                 // UI Initialization Or Setting
                 // --------------------------------------------------
-                StatusSign[0] = new BitmapImage();
-                StatusSign[0].BeginInit();
-                StatusSign[0].UriSource = new Uri(CurrentDirectory + @"\Appendix\Icon\GreenSign.ico", UriKind.RelativeOrAbsolute);
-                StatusSign[0].EndInit();
-                StatusSign[1] = new BitmapImage();
-                StatusSign[1].BeginInit();
-                StatusSign[1].UriSource = new Uri(CurrentDirectory + @"\Appendix\Icon\RedSign.ico", UriKind.RelativeOrAbsolute);
-                StatusSign[1].EndInit();
-
-                IPDataUpdate();
+                Slide_Binarization.Value = 100;
+                Filter_3x3.FilterHandleEvent += Filter_Event;
+                Buffer_x12.BufferHandleEvent += Buffer_Event;
                 // --------------------------------------------------
 
                 // Debug Code Initialization Or Setting
@@ -201,7 +180,7 @@ namespace UI
 
                 if (true)
                 {
-                    IsInitializationFlag = false;
+                    InitializationFlag = true;
                     Console.WriteLine("====================================================================================================");
                     Console.WriteLine("====================================================================================================");
                     Console.WriteLine("====================================================================================================" + "\n");
@@ -230,15 +209,6 @@ namespace UI
             System.Diagnostics.Process ps = new System.Diagnostics.Process();
             ps.StartInfo.FileName = obj.ToString();
             ps.Start();
-        }
-
-        public void UseTime(string title, TimeSpan ts)
-        {
-            if (PrintFlag[0])
-            {
-                string elapsedTime = String.Format("{0:00}:{1:00}:{2:00}.{3:000}", ts.Hours, ts.Minutes, ts.Seconds, ts.Milliseconds);
-                Console.WriteLine(title + elapsedTime);
-            }
         }
 
         private string TimeFormat(int mode, DateTime datetime)
@@ -273,85 +243,62 @@ namespace UI
             }
         }
 
-        public void WriteLogOnUI(string m_Mode, string m_Word)
+        public void DoLog(string message, bool isPrintOnRichTextBox, bool isPrintOnConsole, string mode = "General" )
         {
+            // todo
+
             string m_DateTime = TimeFormat(1, DateTime.Now);
 
-            switch (m_Mode)
+            message = TimeFormat(1, DateTime.Now) + message;
+
+            if (isPrintOnRichTextBox)
+            {
+                Dispatcher.Invoke(() => RichTextBox_GeneralLog.Document.Blocks.Add(new Paragraph(new Run(message))));
+                Dispatcher.Invoke(() => RichTextBox_GeneralLog.ScrollToEnd());
+            }
+
+            if (isPrintOnConsole)
+            {
+                Console.WriteLine(message);
+            }
+
+                switch (mode)
             {
                 case "General":
-                    Dispatcher.Invoke(() => RichTextBox_GeneralLog.Document.Blocks.Add(new Paragraph(new Run(m_DateTime + m_Word))));
-                    Dispatcher.Invoke(() => RichTextBox_GeneralLog.ScrollToEnd());
                     break;
 
                 case "Warning":
-                    Dispatcher.Invoke(() => RichTextBox_GeneralLog.Document.Blocks.Add(new Paragraph(new Run(m_DateTime + m_Word))));
-                    Dispatcher.Invoke(() => RichTextBox_GeneralLog.ScrollToEnd());
                     break;
 
                 case "Error":
-                    Dispatcher.Invoke(() => RichTextBox_GeneralLog.Document.Blocks.Add(new Paragraph(new Run(m_DateTime + m_Word))));
-                    Dispatcher.Invoke(() => RichTextBox_GeneralLog.ScrollToEnd());
                     break;
 
                 default:
-                    Dispatcher.Invoke(() => RichTextBox_GeneralLog.Document.Blocks.Add(new Paragraph(new Run(m_DateTime + "Input Value Was Not Suitable When Log Was Writing."))));
-                    Dispatcher.Invoke(() => RichTextBox_GeneralLog.ScrollToEnd());
                     break;
             }
-        }
 
-        private void RadioButtonBeFalse(int number)
-        {
-            switch (number)
-            {
-
-            }
-        }
-
-        private void ImageBoxPaintFlagBeFalse()
-        {
-            ROIChooseFlag = false;
-            Selecting = false;
-            SelectROI = false;
-            for (int i = 0; i < SelectCenter.Length; i++)
-                SelectCenter[i] = false;
-        }
-
-        private void IPDataUpdate()
-        {
-
+            
         }
         #endregion
 
         #region "UI"
         private void MainWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            IP_1st.Abort();
-
             ShowWindow(Hwnd, SW_HIDE);
         }
 
-        private void TabControl_Station_Selected(object sender, SelectionChangedEventArgs e)
-        {
-            if (!IsInitializationFlag)
-            {
-                
-            }
-        }
-
-        private void ImageBox_FirstStation_MouseMove(object sender, System.Windows.Forms.MouseEventArgs e)
+        private void ImageBox_MouseMove(object sender, System.Windows.Forms.MouseEventArgs e)
         {
             try
             {
-                if (ImageBox_FirstStation.Image == null)
+                if (ImageBox_Main.Image == null)
                 {
                     return;
                 }
 
                 if (Selecting && IsMouseDown)
                 {
-                    if (Selecting && IsMouseDown && SelectROI)
+                    if (Selecting && IsMouseDown && SelectFlexibleROI)
                     {
                         int x = Math.Min(StartPoint_PictureBox.X, e.X);
                         int y = Math.Min(StartPoint_PictureBox.Y, e.Y);
@@ -359,46 +306,14 @@ namespace UI
                         int height = Math.Max(StartPoint_PictureBox.Y, e.Y) - Math.Min(StartPoint_PictureBox.Y, e.Y);
 
                         rectPictureBox = new System.Drawing.Rectangle(x, y, width, height);
-                        ImageBox_FirstStation.Refresh();
+                        ImageBox_Main.Refresh();
                     }
 
-                    if (Selecting && IsMouseDown && SelectCenter[0])
+                    if (Selecting && IsMouseDown && SelectFixedROI)
                     {
                         CenterPoint_PictureBox = new System.Drawing.Point(e.X, e.Y);
-                        ImageBox_FirstStation.Refresh();
+                        ImageBox_Main.Refresh();
                     }
-
-                    if (Selecting && IsMouseDown && SelectCenter[1])
-                    {
-                        CenterPoint_PictureBox = new System.Drawing.Point(e.X, e.Y);
-                        ImageBox_FirstStation.Refresh();
-                    }
-                }
-
-                if (IsShowPixelValue)
-                {
-                    ImageBox imageBox = sender as ImageBox;
-
-                    System.Drawing.Size imgSize = (imageBox.Image as Image<Bgr, byte>).Size;
-
-                    // Calulate Camera Image Coordanite
-                    int imageCoorX = (int)((e.Location.X) * (float)imgSize.Width / (imageBox.Width - 1));
-                    int imageCoorY = (int)((e.Location.Y) * (float)imgSize.Height / (imageBox.Height - 1));
-                    int imageSize = (int)(imgSize.Width * imgSize.Height);
-
-                    // When EmguCV Imagebox scrool bar is active
-                    //imageCoorX += displayImage.HorizontalScrollBar.Visible ? (int)displayImage.HorizontalScrollBar.Value : 0;
-                    //imageCoorY += displayImage.VerticalScrollBar.Visible ? (int)displayImage.VerticalScrollBar.Value : 0;
-
-                    int index = imageCoorY * imgSize.Width + imageCoorX;
-                    index = index < 0 ? 0 : index > imageSize - 1 ? imageSize - 1 : index;
-
-                    byte pixel = ((Image<Bgr, byte>)(ImageBox_FirstStation.Image)).Bytes[index];
-
-                    //State.Text = "Position: (" + Convert.ToString(imageCoorX) + ", " + Convert.ToString(imageCoorY) + ")\tDepth: " + pixel.ToString();
-                    string state = "Position: (" + Convert.ToString(imageCoorX) + ", " + Convert.ToString(imageCoorY) + ")\tDepth: " + pixel.ToString();
-
-                    //PictureBoxMouseMoveEvent.Invoke(state);
                 }
             }
             catch (Exception ex)
@@ -407,7 +322,7 @@ namespace UI
             }
         }
 
-        private void ImageBox_FirstStation_MouseDown(object sender, System.Windows.Forms.MouseEventArgs e)
+        private void ImageBox_MouseDown(object sender, System.Windows.Forms.MouseEventArgs e)
         {
             if (Selecting == true)
             {
@@ -416,36 +331,21 @@ namespace UI
                 StartPoint_PictureBox = e.Location;
             }
 
-            if (SelectROI)
+            if (SelectFlexibleROI)
             {
-                IsMouseDown = true;
-
-                ImageROI_StartPoint.X = (int)((e.Location.X) * (float)CameraImageWidth / ((sender as ImageBox).Width - 1));
-                ImageROI_StartPoint.Y = (int)((e.Location.Y) * (float)CameraImageHeight / ((sender as ImageBox).Height - 1));
+                ImageROI_StartPoint.X = (int)((e.Location.X) * (float)(Buffer_x12.GetImage(Buffer_x12.CurrentIndex).Width) / ((sender as ImageBox).Width - 1));
+                ImageROI_StartPoint.Y = (int)((e.Location.Y) * (float)(Buffer_x12.GetImage(Buffer_x12.CurrentIndex).Height) / ((sender as ImageBox).Height - 1));
             }
 
-            if (SelectCenter[0])
+            if (SelectFixedROI)
             {
-                IsMouseDown = true;
-
-                //FirstPictureBox_ROILength = Convert.ToInt32((Convert.ToDouble(FirstStationData.IP_Config.parameters.Parameter01[11]) / FirstStationData.Resolution) * Convert.ToDouble((sender as ImageBox).Width - 1) / Convert.ToDouble(CameraImageWidth));
-
                 CenterPoint_PictureBox = new System.Drawing.Point(e.X, e.Y);
 
-                ImageBox_FirstStation.Refresh();
-            }
-
-            if (SelectCenter[1])
-            {
-                IsMouseDown = true;
-
-                CenterPoint_PictureBox = new System.Drawing.Point(e.X, e.Y);
-
-                ImageBox_FirstStation.Refresh();
+                ImageBox_Main.Refresh();
             }
         }
 
-        private void ImageBox_FirstStation_MouseUp(object sender, System.Windows.Forms.MouseEventArgs e)
+        private void ImageBox_MouseUp(object sender, System.Windows.Forms.MouseEventArgs e)
         {
             if (Selecting)
             {
@@ -454,14 +354,13 @@ namespace UI
                 EndPoint_PictureBox = e.Location;
             }
 
-            if (SelectROI)
+            if (SelectFlexibleROI)
             {
-                SelectROI = false;
+                SelectFlexibleROI = false;
                 IsMouseDown = false;
 
-                // Calulate Camera Image Coordanite
-                ImageROI_EndPoint.X = (int)((e.Location.X) * (float)CameraImageWidth / ((sender as ImageBox).Width - 1));
-                ImageROI_EndPoint.Y = (int)((e.Location.Y) * (float)CameraImageHeight / ((sender as ImageBox).Height - 1));
+                ImageROI_EndPoint.X = (int)((e.Location.X) * (float)(Buffer_x12.GetImage(Buffer_x12.CurrentIndex).Width) / ((sender as ImageBox).Width - 1));
+                ImageROI_EndPoint.Y = (int)((e.Location.Y) * (float)(Buffer_x12.GetImage(Buffer_x12.CurrentIndex).Height) / ((sender as ImageBox).Height - 1));
 
                 int x = Math.Min(ImageROI_StartPoint.X, ImageROI_EndPoint.X);
                 int y = Math.Min(ImageROI_StartPoint.Y, ImageROI_EndPoint.Y);
@@ -469,98 +368,32 @@ namespace UI
                 int height = Math.Abs(ImageROI_StartPoint.Y - ImageROI_EndPoint.Y);
 
                 rectImageROI = new System.Drawing.Rectangle(x, y, width, height);
-
-                if (rectImageROI.X >= 0 && rectImageROI.Y >= 0 && (rectImageROI.X + rectImageROI.Width) <= CameraImageWidth && (rectImageROI.Y + rectImageROI.Height) <= CameraImageHeight)
-                {
-                    switch (ROINumber)
-                    {
-                        case 100:
-                            //FirstStationData.IP_Config.parameters.ROI01 = rectImageROI;
-                            break;
-
-                        default:
-                            break;
-                    }
-                }
-                else
-                {
-                    WriteLogOnUI("Warning", "K1檢測站的ROI設定失敗!");
-                }
+                Buffer_x12.AddImage(Buffer_x12.VisibleCount, "ROI Image", BasicAlgorithm.GetROI(Buffer_x12.GetImage(Buffer_x12.CurrentIndex), rectImageROI));
             }
 
-            if (SelectCenter[0])
+            if (SelectFixedROI)
             {
-                SelectCenter[0] = false;
+                SelectFixedROI = false;
                 IsMouseDown = false;
 
-                Image_CenterPoint.X = (int)((e.Location.X) * (float)CameraImageWidth / ((sender as ImageBox).Width - 1));
-                Image_CenterPoint.Y = (int)((e.Location.Y) * (float)CameraImageHeight / ((sender as ImageBox).Height - 1));
+                ImageROI_CenterPoint.X = (int)((e.Location.X) * (float)(Buffer_x12.GetImage(Buffer_x12.CurrentIndex).Width) / ((sender as ImageBox).Width - 1));
+                ImageROI_CenterPoint.Y = (int)((e.Location.Y) * (float)(Buffer_x12.GetImage(Buffer_x12.CurrentIndex).Height) / ((sender as ImageBox).Height - 1));
 
-                int x = (int)((e.Location.X - 6) * (float)CameraImageWidth / ((sender as ImageBox).Width - 1));
-                int y = (int)((e.Location.Y - 120) * (float)CameraImageHeight / ((sender as ImageBox).Height - 1));
-                int width = (int)((12) * (float)CameraImageWidth / ((sender as ImageBox).Width - 1));
-                int height = (int)((240) * (float)CameraImageHeight / ((sender as ImageBox).Height - 1));
-
-                rectImageROI = new System.Drawing.Rectangle(x, y, width, height);
-
-                if (rectImageROI.X >= 0 && rectImageROI.Y >= 0 && (rectImageROI.X + rectImageROI.Width) <= CameraImageWidth && (rectImageROI.Y + rectImageROI.Height) <= CameraImageHeight)
-                {
-                    switch (CenterNumber)
-                    {
-                        case 100:
-                            //FirstStationData.IP_Config.parameters.ROI01 = rectImageROI;
-                            break;
-
-                        default:
-                            break;
-                    }
-                }
-                else
-                {
-                    WriteLogOnUI("Warning", "K1檢測站的ROI設定失敗!");
-                }
-            }
-
-            if (SelectCenter[1])
-            {
-                SelectCenter[1] = false;
-                IsMouseDown = false;
-
-                Image_CenterPoint.X = (int)((e.Location.X) * (float)CameraImageWidth / ((sender as ImageBox).Width - 1));
-                Image_CenterPoint.Y = (int)((e.Location.Y) * (float)CameraImageHeight / ((sender as ImageBox).Height - 1));
-
-                int x = (int)((e.Location.X - 60) * (float)CameraImageWidth / ((sender as ImageBox).Width - 1));
-                int y = (int)((e.Location.Y - 60) * (float)CameraImageHeight / ((sender as ImageBox).Height - 1));
-                int width = (int)((120) * (float)CameraImageWidth / ((sender as ImageBox).Width - 1));
-                int height = (int)((120) * (float)CameraImageHeight / ((sender as ImageBox).Height - 1));
+                int x = (int)((e.Location.X - 60) * (float)(Buffer_x12.GetImage(Buffer_x12.CurrentIndex).Width) / ((sender as ImageBox).Width - 1));
+                int y = (int)((e.Location.Y - 60) * (float)(Buffer_x12.GetImage(Buffer_x12.CurrentIndex).Height) / ((sender as ImageBox).Height - 1));
+                int width = (int)((120) * (float)(Buffer_x12.GetImage(Buffer_x12.CurrentIndex).Width) / ((sender as ImageBox).Width - 1));
+                int height = (int)((120) * (float)(Buffer_x12.GetImage(Buffer_x12.CurrentIndex).Height) / ((sender as ImageBox).Height - 1));
 
                 rectImageROI = new System.Drawing.Rectangle(x, y, width, height);
-
-                if (rectImageROI.X >= 0 && rectImageROI.Y >= 0 && (rectImageROI.X + rectImageROI.Width) <= CameraImageWidth && (rectImageROI.Y + rectImageROI.Height) <= CameraImageHeight)
-                {
-                    switch (CenterNumber)
-                    {
-                        case 190:
-                            FirstStationData.RectAdjust = rectImageROI;
-                            ROIChooseFlag = false;
-                            break;
-
-                        default:
-                            break;
-                    }
-                }
-                else
-                {
-                    WriteLogOnUI("Warning", "K1檢測站的ROI設定失敗!");
-                }
+                Buffer_x12.AddImage(Buffer_x12.VisibleCount, "ROI Image", BasicAlgorithm.GetROI(Buffer_x12.GetImage(Buffer_x12.CurrentIndex), rectImageROI));
             }
         }
 
-        private void ImageBox_FirstStation_Paint(object sender, System.Windows.Forms.PaintEventArgs e)
+        private void ImageBox_Paint(object sender, System.Windows.Forms.PaintEventArgs e)
         {
             if (IsMouseDown)
             {
-                if (SelectROI)
+                if (SelectFlexibleROI)
                 {
                     using (System.Drawing.Pen pen = new System.Drawing.Pen(System.Drawing.Color.Red, 2))
                     {
@@ -568,16 +401,7 @@ namespace UI
                     }
                 }
 
-                if (SelectCenter[0])
-                {
-                    using (System.Drawing.Pen pen = new System.Drawing.Pen(System.Drawing.Color.Red, 2))
-                    {
-                        e.Graphics.DrawRectangle(pen, new System.Drawing.Rectangle(CenterPoint_PictureBox.X - 6, CenterPoint_PictureBox.Y - 120, 12, 240));
-                        e.Graphics.DrawLine(pen, CenterPoint_PictureBox.X + 6 + FirstPictureBox_ROILength, CenterPoint_PictureBox.Y - 120, CenterPoint_PictureBox.X + 6 + FirstPictureBox_ROILength, CenterPoint_PictureBox.Y + 120);
-                    }
-                }
-
-                if (SelectCenter[1])
+                if (SelectFixedROI)
                 {
                     using (System.Drawing.Pen pen = new System.Drawing.Pen(System.Drawing.Color.Red, 2))
                     {
@@ -587,225 +411,191 @@ namespace UI
             }
         }
 
-        private void Btn_F_Open_Click(object sender, RoutedEventArgs e)
+        private void Btn_Click(object sender, RoutedEventArgs e)
         {
-            Microsoft.Win32.OpenFileDialog openFileDialog = new Microsoft.Win32.OpenFileDialog();
-
-            openFileDialog.Multiselect = false;
-            openFileDialog.Filter = "Bitmap files (*.bmp)|*.bmp|JPEG files (*.jpg)|*.jpg|All files (*.*)|*.*";
-
-            if (openFileDialog.ShowDialog() == true)
+            try
             {
-                RadioButtonBeFalse(1);
+                if (InitializationFlag)
+                {
+                    switch ((sender as System.Windows.Controls.Button).Name)
+                    {
+                        case "Btn_Open":
+                            {
+                                Microsoft.Win32.OpenFileDialog openFileDialog = new Microsoft.Win32.OpenFileDialog();
 
-                ImageSource[0] = 0;
+                                openFileDialog.Multiselect = false;
+                                openFileDialog.Filter = "Bitmap files (*.bmp)|*.bmp|JPEG files (*.jpg)|*.jpg|All files (*.*)|*.*";
 
-                FirstStationData.SetImage(0, new Image<Bgr, byte>(openFileDialog.FileName));
-                FirstStationData.SetImage(1, FirstStationData.GetImage(2));
+                                if (openFileDialog.ShowDialog() == true)
+                                {
+                                    if (Buffer_x12.AddImage(Buffer_x12.VisibleCount, "Source Image", new Image<Bgr, byte>(openFileDialog.FileName)))
+                                    {
+                                        DoLog("完成圖檔開啟!", true, true, "General"); // todo
+                                    }
+                                    else
+                                    {
+                                        DoLog("Buffer已滿", true, true, "General"); // todo
+                                    }
+                                }
+                                else
+                                {
+                                    DoLog("未完成圖檔開啟!", true, true, "General"); // todo
+                                }
+                            }
+                            break;
 
-                ImageBox_FirstStation.Image = FirstStationData.GetImage(ImageSource[0]);
+                        case "Btn_Save":
+                            {
+                                Microsoft.Win32.SaveFileDialog saveFileDialog = new Microsoft.Win32.SaveFileDialog();
 
-                WriteLogOnUI("General", "完成圖檔開啟!");
+                                saveFileDialog.Filter = ".bmp|*.bmp";
+
+                                if (saveFileDialog.ShowDialog() == true && Buffer_x12.CurrentIndex >= 0 && Buffer_x12.CurrentIndex < Buffer_x12.VisibleCount)
+                                {
+                                    Buffer_x12.GetImage(Buffer_x12.CurrentIndex).Save(saveFileDialog.FileName);
+                                    DoLog("完成圖檔儲存!", true, true, "General"); // todo
+                                }
+                                else
+                                {
+                                    DoLog("未完成圖檔儲存!", true, true, "General"); // todo
+                                }
+                            }
+                            break;
+
+                        case "Btn_Copy":
+                            {
+                                Buffer_x12.AddImage(Buffer_x12.VisibleCount, "Copy Image", Buffer_x12.GetImage(Buffer_x12.CurrentIndex));
+                                DoLog("完成灰階!", true, true, "General"); // todo
+                            }
+                            break;
+
+                        case "Btn_Delete":
+                            {
+                                Buffer_x12.RemoveImage(Buffer_x12.CurrentIndex);
+                                Buffer_x12.ResetAllRadioButtons();
+                                ImageBox_Main.Image = Buffer_x12.GetImage(Buffer_x12.CurrentIndex);
+                                DoLog("Delete", true, true, "General"); // todo
+                            }
+                            break;
+
+                        case "Btn_Gray":
+                            {
+                                Buffer_x12.AddImage(Buffer_x12.VisibleCount, "Grayscale Image", BasicAlgorithm.ToBGR(BasicAlgorithm.ToGray(Buffer_x12.GetImage(Buffer_x12.CurrentIndex))));
+                                DoLog("完成灰階!", true, true, "General"); // todo
+                            }
+                            break;
+
+                        case "Btn_Dilation":
+                            {
+                                Buffer_x12.AddImage(Buffer_x12.VisibleCount, "Dilated Image", BasicAlgorithm.ToBGR(BasicAlgorithm.ToDilation(BasicAlgorithm.ToGray(Buffer_x12.GetImage(Buffer_x12.CurrentIndex)))));
+                                DoLog("完成膨脹!", true, true, "General"); // todo
+                            }
+                            break;
+
+                        case "Btn_Erosion":
+                            {
+                                Buffer_x12.AddImage(Buffer_x12.VisibleCount, "Eroded Image", BasicAlgorithm.ToBGR(BasicAlgorithm.ToErosion(BasicAlgorithm.ToGray(Buffer_x12.GetImage(Buffer_x12.CurrentIndex)))));
+                                DoLog("完成侵蝕!", true, true, "General"); // todo
+                            }
+                            break;
+
+                        case "Btn_ROI":
+                            {
+                                if (0 == 0)
+                                    SelectFlexibleROI = true; // ROI Option 1
+                                else
+                                    SelectFixedROI = true; // ROI Option 2
+                                Selecting = true;
+                            }
+                            break;
+
+                        case "Btn_Reset":
+                            {
+                                Restart();
+                            }
+                            break;
+
+                        case "test1":
+                            {
+                                // todo
+                            }
+                            break;
+
+                        case "test2":
+                            {
+                                // todo
+                            }
+                            break;
+
+                        default:
+                            {
+
+                            }
+                            break;
+                    }
+                }
             }
-            else
+            catch (Exception Ex)
             {
-                WriteLogOnUI("General", "未完成圖檔開啟!");
+                Console.WriteLine("Exception Occurred When Button Clicked. Message:" + Ex.Message);
             }
         }
 
-        private void Btn_F_Save_Click(object sender, RoutedEventArgs e)
+        private void Slide_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
-            Microsoft.Win32.SaveFileDialog saveFileDialog = new Microsoft.Win32.SaveFileDialog();
-
-            saveFileDialog.Filter = ".bmp|*.bmp";
-
-            if (saveFileDialog.ShowDialog() == true && ImageSource[0] >= 0)
+            try
             {
-                FirstStationData.GetImage(ImageSource[0]).Save(saveFileDialog.FileName);
+                if (InitializationFlag)
+                {
+                    switch ((sender as System.Windows.Controls.Slider).Name)
+                    {
+                        case "Slide_Binarization":
+                            {
+                                ImageBox_Main.Image = BasicAlgorithm.ToBGR(BasicAlgorithm.ToBinarization(BasicAlgorithm.ToGray(Buffer_x12.GetImage(Buffer_x12.CurrentIndex)), new Gray(Convert.ToInt32(e.NewValue))));
+                            }
+                            break;
 
-                WriteLogOnUI("General", "完成圖檔儲存!");
+                        default:
+                            {
+
+                            }
+                            break;
+                    }
+                }
             }
-            else
+            catch (Exception Ex)
             {
-                WriteLogOnUI("General", "未完成圖檔儲存!");
-            }
-        }
 
-        private void Btn_F_Origin_Click(object sender, RoutedEventArgs e)
-        {
-            ImageSource[0] = 0;
-
-            ImageBox_FirstStation.Image = FirstStationData.GetImage(ImageSource[0]);
-
-            RadioButtonBeFalse(1);
-        }
-
-        private void Btn_F_ROI_Click(object sender, RoutedEventArgs e)
-        {
-            RadioButtonBeFalse(1);
-            ImageBoxPaintFlagBeFalse();
-
-            switch ((sender as System.Windows.Controls.Button).Name)
-            {
-                case "Btn_F_Item01_ROI":
-                    ImageBox_FirstStation.Image = FirstStationData.GetImage(0);
-
-                    CenterNumber = 100;
-                    SelectCenter[0] = true;
-                    Selecting = true;
-
-                    break;
-
-                case "Btn_F_Adjustment":
-                    ROIChooseFlag = true;
-                    ImageBox_FirstStation.Image = FirstStationData.GetImage(0);
-
-                    CenterNumber = 190;
-                    SelectCenter[1] = true;
-                    Selecting = true;
-
-                    break;
-
-                default:
-                    WriteLogOnUI("Error", "選取ROI時發生異常!");
-                    break;
             }
         }
 
-        private void Btn_F_IP_Click(object sender, RoutedEventArgs e)
+        private void Slide_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
         {
-            switch ((sender as System.Windows.Controls.Button).Name)
+            try
             {
-                //IP Of Item "1".
-                case "Btn_F_Item01_IP":
-                    FirstStationData.InspectionItemFlag[0] = true;
-                    FirstStationData.InspectionItemFlag[1] = false;
-                    FirstStationData.InspectionItemFlag[2] = false;
-                    FirstStationData.InspectionItemFlag[3] = false;
-
-                    RadioButtonBeFalse(1);
-
-                    //Do Image Processing
-                    if (FirstStationData.DoInspectionFlag)
+                if (InitializationFlag)
+                {
+                    switch ((sender as System.Windows.Controls.Slider).Name)
                     {
-                        WriteLogOnUI("Warning", "K1影像處理線執行緒正在使用中!");
+                        case "Slide_Binarization":
+                            {
+                                Buffer_x12.AddImage(Buffer_x12.VisibleCount, "Binary Image", BasicAlgorithm.ToBGR(BasicAlgorithm.ToBinarization(BasicAlgorithm.ToGray(Buffer_x12.GetImage(Buffer_x12.CurrentIndex)), new Gray(Convert.ToInt32((sender as System.Windows.Controls.Slider).Value)))));
+                                DoLog("完成二質化!", true, true, "General"); // todo
+                            }
+                            break;
+
+                        default:
+                            {
+
+                            }
+                            break;
                     }
-                    else
-                    {
-                        FirstStationData.Barcode = "Manual";
-                        FirstStationData.TriggerCount = 1;
-                        FirstStationData.SerialNumber = 1;
-                        FirstStationData.DoInspectionFlag = true;
-                    }
-
-                    break;
-
-                //IP Of Item "2".
-                case "Btn_F_Item02_IP":
-                    FirstStationData.InspectionItemFlag[0] = false;
-                    FirstStationData.InspectionItemFlag[1] = true;
-                    FirstStationData.InspectionItemFlag[2] = false;
-                    FirstStationData.InspectionItemFlag[3] = false;
-
-                    RadioButtonBeFalse(1);
-
-                    //Do Image Processing
-                    if (FirstStationData.DoInspectionFlag)
-                    {
-                        WriteLogOnUI("Warning", "K1影像處理線執行緒正在使用中!");
-                    }
-                    else
-                    {
-                        FirstStationData.Barcode = "Manual";
-                        FirstStationData.TriggerCount = 1;
-                        FirstStationData.SerialNumber = 1;
-                        FirstStationData.DoInspectionFlag = true;
-                    }
-
-                    break;
-
-                //IP Of Item "2".
-                case "Btn_F_Item03_IP":
-                    FirstStationData.InspectionItemFlag[0] = false;
-                    FirstStationData.InspectionItemFlag[1] = false;
-                    FirstStationData.InspectionItemFlag[2] = true;
-                    FirstStationData.InspectionItemFlag[3] = false;
-
-                    RadioButtonBeFalse(1);
-
-                    //Do Image Processing
-                    if (FirstStationData.DoInspectionFlag)
-                    {
-                        WriteLogOnUI("Warning", "K1影像處理線執行緒正在使用中!");
-                    }
-                    else
-                    {
-                        FirstStationData.Barcode = "Manual";
-                        FirstStationData.TriggerCount = 1;
-                        FirstStationData.SerialNumber = 1;
-                        FirstStationData.DoInspectionFlag = true;
-                    }
-
-                    break;
-
-                default:
-                    break;
+                }
             }
-        }
-
-
-        private void RadioButton_FirstStation_Checked(object sender, RoutedEventArgs e)
-        {
-            switch ((sender as System.Windows.Controls.RadioButton).Name)
+            catch (Exception Ex)
             {
-                case "RadioButton_F_Item01_ROI01":
-                    ImageSource[0] = 10;
-                    ImageBox_FirstStation.Image = FirstStationData.GetImage(ImageSource[0]);
-                    break;
 
-                case "RadioButton_F_Item01_ROI02":
-                    ImageSource[0] = 10;
-                    ImageBox_FirstStation.Image = FirstStationData.GetImage(ImageSource[0]);
-                    break;
-
-                case "RadioButton_F_Item01_Result01":
-                    ImageSource[0] = 1;
-                    ImageBox_FirstStation.Image = FirstStationData.GetImage(ImageSource[0]);
-                    break;
-
-                case "RadioButton_F_Item01_Result02":
-                    ImageSource[0] = 1;
-                    ImageBox_FirstStation.Image = FirstStationData.GetImage(ImageSource[0]);
-                    break;
-
-                case "RadioButton_F_Item02_ROI":
-                    ImageSource[0] = 10;
-                    ImageBox_FirstStation.Image = FirstStationData.GetImage(ImageSource[0]);
-                    break;
-
-                case "RadioButton_F_Item02_Result":
-                    ImageSource[0] = 1;
-                    ImageBox_FirstStation.Image = FirstStationData.GetImage(ImageSource[0]);
-                    break;
-
-                case "RadioButton_F_Item03_ROI":
-                    ImageSource[0] = 10;
-                    ImageBox_FirstStation.Image = FirstStationData.GetImage(ImageSource[0]);
-                    break;
-
-                case "RadioButton_F_Item03_Result":
-                    ImageSource[0] = 1;
-                    ImageBox_FirstStation.Image = FirstStationData.GetImage(ImageSource[0]);
-                    break;
-
-                default:
-                    break;
             }
-        }
-
-        private void NumericUpDown_F_Parameter_ValueChanged(object sender, EventArgs e)
-        {
-
         }
 
         private void OnKeyDownHandler(object sender, System.Windows.Input.KeyEventArgs e)
