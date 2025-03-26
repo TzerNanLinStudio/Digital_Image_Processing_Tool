@@ -194,6 +194,10 @@
       <Project>{34e79f33-72e4-42bb-9707-fff21ad849ea}</Project>
       <Name>ImageProcessing</Name>
     </ProjectReference>
+    <ProjectReference Include="..\LogRecorder\LogRecorder.vcxproj">
+      <Project>{7662a689-1b73-464a-a98f-13bb336cdcf3}</Project>
+      <Name>LogRecorder</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.7.2">

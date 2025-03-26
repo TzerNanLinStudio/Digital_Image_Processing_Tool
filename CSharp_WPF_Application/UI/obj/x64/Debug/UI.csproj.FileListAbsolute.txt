@@ -97,3 +97,5 @@ C:\Users\goodc\OneDrive\Desktop\Git\Digital_Image_Processing_and_Analysis_Tool\C
 C:\Users\goodc\OneDrive\Desktop\Git\Digital_Image_Processing_and_Analysis_Tool\CSharp_WPF_Application\UI\obj\x64\Debug\UI.exe
 C:\Users\goodc\OneDrive\Desktop\Git\Digital_Image_Processing_and_Analysis_Tool\CSharp_WPF_Application\UI\obj\x64\Debug\Buffer.g.cs
 C:\Users\goodc\OneDrive\Desktop\Git\Digital_Image_Processing_and_Analysis_Tool\CSharp_WPF_Application\UI\obj\x64\Debug\Buffer.baml
+C:\Users\goodc\OneDrive\Desktop\Git\Digital_Image_Processing_and_Analysis_Tool\CSharp_WPF_Application\UI\bin\x64\Debug\LogRecorder.dll
+C:\Users\goodc\OneDrive\Desktop\Git\Digital_Image_Processing_and_Analysis_Tool\CSharp_WPF_Application\UI\bin\x64\Debug\LogRecorder.pdb

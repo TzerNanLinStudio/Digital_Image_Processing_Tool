@@ -29,7 +29,7 @@ using Emgu.CV.Structure;
 using Emgu.CV.CvEnum;
 using ImageProcessing;
 using Config;
-//using LOGRECORDER;
+using LOGRECORDER;
 
 namespace UI
 {
@@ -39,26 +39,12 @@ namespace UI
     public partial class MainWindow : Window
     {
         #region "Parameter"
-        // Commend Window Parameter
-        // --------------------------------------------------
-        [DllImport("kernel32.dll")]
-        static extern IntPtr GetConsoleWindow();
-
-        [DllImport("user32.dll")]
-        static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
-
-        private const int SW_HIDE = 0;
-        private const int SW_SHOW = 5;
-
-        IntPtr Hwnd = GetConsoleWindow();
-        // --------------------------------------------------
-
-        // UI Parameter
+        // Initialization Parameter
         // --------------------------------------------------
         public bool InitializationFlag = false;
         // --------------------------------------------------
 
-        // Used For Picture Box Selection
+        // Picture Box Selection Parameter
         // --------------------------------------------------
         public bool IsMouseDown = false;
 
@@ -74,11 +60,6 @@ namespace UI
         public System.Drawing.Point ImageROI_StartPoint;
         public System.Drawing.Point ImageROI_EndPoint;
         public System.Drawing.Point ImageROI_CenterPoint;
-        // --------------------------------------------------
-
-        // IP Parameter
-        // --------------------------------------------------
-
         // --------------------------------------------------
 
         // Other Parameter
@@ -140,14 +121,6 @@ namespace UI
         {
             try
             {
-                if (true)
-                {
-                    InitializationFlag = false;
-                    Console.WriteLine("====================================================================================================");
-                    Console.WriteLine("====================================================================================================");
-                    Console.WriteLine("====================================================================================================");
-                }
-
                 // 暫時紀錄代辦任務，完成後即可刪除
                 Console.WriteLine("使用config紀錄UI參數-如3*3filter設定，像是影像處裡或是UI");
                 Console.WriteLine("使用log，但是gitignore得忽視存下的檔案");
@@ -156,35 +129,13 @@ namespace UI
                 Console.WriteLine("完成todo");
                 Console.WriteLine("清除不必要檔案");
 
-                // System Initialization Or Setting
-                // --------------------------------------------------
-                ShowWindow(Hwnd, SW_HIDE);
-                // --------------------------------------------------
+                EnsureDirectoriesExist();
 
-                // IP Initialization Or Setting
-                // --------------------------------------------------
-
-                // --------------------------------------------------
-
-                // UI Initialization Or Setting
-                // --------------------------------------------------
                 Slide_Binarization.Value = 100;
                 Filter_3x3.FilterHandleEvent += Filter_Event;
                 Buffer_x12.BufferHandleEvent += Buffer_Event;
-                // --------------------------------------------------
 
-                // Debug Code Initialization Or Setting
-                // --------------------------------------------------
-
-                // --------------------------------------------------
-
-                if (true)
-                {
-                    InitializationFlag = true;
-                    Console.WriteLine("====================================================================================================");
-                    Console.WriteLine("====================================================================================================");
-                    Console.WriteLine("====================================================================================================" + "\n");
-                }
+                InitializationFlag = true;
             }
             catch (Exception EX)
             {
@@ -209,6 +160,38 @@ namespace UI
             System.Diagnostics.Process ps = new System.Diagnostics.Process();
             ps.StartInfo.FileName = obj.ToString();
             ps.Start();
+        }
+
+        /// <summary>
+        /// 檢查並創建必要的目錄結構
+        /// </summary>
+        public void EnsureDirectoriesExist()
+        {
+            string currentDirectory = CurrentDirectory;
+            string appendixPath = System.IO.Path.Combine(currentDirectory, "Appendix");
+            string configPath = System.IO.Path.Combine(appendixPath, "Config");
+            string logPath = System.IO.Path.Combine(appendixPath, "Log");
+
+            // 檢查並創建 Appendix 資料夾
+            if (!System.IO.Directory.Exists(appendixPath))
+            {
+                System.IO.Directory.CreateDirectory(appendixPath);
+                System.Console.WriteLine("已創建 Appendix 資料夾");
+            }
+
+            // 檢查並創建 Config 資料夾
+            if (!System.IO.Directory.Exists(configPath))
+            {
+                System.IO.Directory.CreateDirectory(configPath);
+                System.Console.WriteLine("已創建 Config 資料夾");
+            }
+
+            // 檢查並創建 Log 資料夾
+            if (!System.IO.Directory.Exists(logPath))
+            {
+                System.IO.Directory.CreateDirectory(logPath);
+                System.Console.WriteLine("已創建 Log 資料夾");
+            }
         }
 
         private string TimeFormat(int mode, DateTime datetime)
@@ -279,12 +262,12 @@ namespace UI
 
             
         }
-        #endregion
+#endregion
 
-        #region "UI"
+                #region "UI"
         private void MainWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            ShowWindow(Hwnd, SW_HIDE);
+
         }
 
         private void ImageBox_MouseMove(object sender, System.Windows.Forms.MouseEventArgs e)
@@ -602,14 +585,14 @@ namespace UI
         {
             if (e.Key == Key.S && (Keyboard.Modifiers & (ModifierKeys.Control | ModifierKeys.Shift)) == (ModifierKeys.Control | ModifierKeys.Shift))
             {
-                ShowWindow(Hwnd, SW_SHOW);
+
             }
 
             if (e.Key == Key.H && (Keyboard.Modifiers & (ModifierKeys.Control | ModifierKeys.Shift)) == (ModifierKeys.Control | ModifierKeys.Shift))
             {
-                ShowWindow(Hwnd, SW_HIDE);
+
             }
         }
-        #endregion
+                #endregion
     }
 }
