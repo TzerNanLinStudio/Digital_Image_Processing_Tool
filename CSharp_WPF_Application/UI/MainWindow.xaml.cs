@@ -81,7 +81,6 @@ namespace UI
         // Other Parameter
         // --------------------------------------------------
         public System.String CurrentDirectory = System.Environment.CurrentDirectory;
-        private static readonly System.Globalization.CultureInfo CI = System.Globalization.CultureInfo.InvariantCulture;
         // --------------------------------------------------
 
         // Debug Parameter
@@ -95,7 +94,7 @@ namespace UI
         public MainWindow()
         {
             InitializeComponent();
-            InitializeUI();
+            SetupUI();
         }
 
         #region "Event"
@@ -112,7 +111,7 @@ namespace UI
                 else
                 {
                     Buffer_x12.AddImage(Buffer_x12.VisibleCount, "Filter Image", BasicAlgorithm.ToBGR(BasicAlgorithm.ApplyCustomFilter(BasicAlgorithm.ToGray(Buffer_x12.GetImage(Buffer_x12.CurrentIndex)), UI_Config.parameters.Kernel)));
-                    DoLog("完成濾波!", true, true, "General"); // todo
+                    HandleMessage("完成濾波!", true, true, "General"); // todo
                 }
             }
             catch (Exception Ex)
@@ -135,24 +134,24 @@ namespace UI
         #endregion
 
         #region "Function"
-        private void InitializeUI()
+        /// <summary>
+        /// Initializes the UI components, sets initial parameter values,
+        /// binds event handlers, and prepares necessary resources such as log files and directories.
+        /// </summary>
+        private void SetupUI()
         {
             try
             {
                 // 暫時紀錄代辦任務，完成後即可刪除
-                Console.WriteLine("使用log");
+                Console.WriteLine("完全使用log");
                 Console.WriteLine("美化英文UI");
                 Console.WriteLine("完成基本英文註解");
                 Console.WriteLine("完成todo");
                 Console.WriteLine("清除不必要檔案");
 
                 EnsureDirectoriesExist();
-                Config_Init(true);
-                LogFileInitialization(m_LogFileRecipeDirectionPath + m_LogFileNameHeader);
-
-                LogWritter.MsgError("Exception Occured When Document Opened. Message : " ); // todo
-                LogWritter.MsgWarning("K1 Camera Thread Was Busy When PLC Triggered."); // todo
-                LogWritter.MsgGenLog("UI Had Been Locked."); // todo
+                InitializeConfig(true);
+                InitializeLogFiles(m_LogFileRecipeDirectionPath + m_LogFileNameHeader);
 
                 Slide_Binarization.Value = UI_Config.parameters.Threshold;
                 for (int x = 0; x < Filter_3x3.StackPanel_NineSquare.Children.Count; x++)
@@ -174,19 +173,26 @@ namespace UI
             }
         }
 
-        private void Restart()
+        /// <summary>
+        /// Restarts the application by closing the current instance and launching a new one.
+        /// </summary>
+        private void RestartApplication()
         {
             Close();
 
             System.Threading.Thread thtmp = new System.Threading.Thread(new
-            System.Threading.ParameterizedThreadStart(ReRun));
+            System.Threading.ParameterizedThreadStart(RunApplication));
 
             object appName = System.Windows.Forms.Application.ExecutablePath;
             System.Threading.Thread.Sleep(2000);
             thtmp.Start(appName);
         }
 
-        private void ReRun(Object obj)
+        /// <summary>
+        /// Launches a new process of the application.
+        /// </summary>
+        /// <param name="obj">The executable path of the application.</param>
+        private void RunApplication(Object obj)
         {
             System.Diagnostics.Process ps = new System.Diagnostics.Process();
             ps.StartInfo.FileName = obj.ToString();
@@ -194,7 +200,7 @@ namespace UI
         }
 
         /// <summary>
-        /// 檢查並創建必要的目錄結構
+        /// Ensures that necessary directories (Appendix, Config, Log) exist. If not, creates them.
         /// </summary>
         public void EnsureDirectoriesExist()
         {
@@ -203,99 +209,93 @@ namespace UI
             string configPath = System.IO.Path.Combine(appendixPath, "Config");
             string logPath = System.IO.Path.Combine(appendixPath, "Log");
 
-            // 檢查並創建 Appendix 資料夾
             if (!System.IO.Directory.Exists(appendixPath))
             {
                 System.IO.Directory.CreateDirectory(appendixPath);
-                System.Console.WriteLine("已創建 Appendix 資料夾");
             }
 
-            // 檢查並創建 Config 資料夾
             if (!System.IO.Directory.Exists(configPath))
             {
                 System.IO.Directory.CreateDirectory(configPath);
-                System.Console.WriteLine("已創建 Config 資料夾");
             }
 
-            // 檢查並創建 Log 資料夾
             if (!System.IO.Directory.Exists(logPath))
             {
                 System.IO.Directory.CreateDirectory(logPath);
-                System.Console.WriteLine("已創建 Log 資料夾");
             }
         }
 
-        public void Config_Init(bool WhetherLoad)
+        /// <summary>
+        /// Initializes configuration data from file. Optionally loads values into the UI.
+        /// </summary>
+        /// <param name="WhetherLoad">If true, loads configuration into the UI after initialization.</param>
+        public void InitializeConfig(bool WhetherLoad)
         {
             m_RecipeFullPath = m_RecipeDirectoryPath + m_RecipeFilename + m_RecipeSubtitle;
 
             UI_Config = new CustomConfig_UI(m_RecipeFullPath);
 
             if (WhetherLoad)
-                Config_Load();
+                LoadConfig();
         }
 
-        public void Config_Load()
+        /// <summary>
+        /// Loads configuration values into the UI components.
+        /// </summary>
+        public void LoadConfig()
         {
             if (UI_Config.Load() == false) return;
         }
-
-        public void Config_Save()
+       
+        /// <summary>
+        /// Saves the current UI configuration to file.
+        /// </summary>
+        public void SaveConfig()
         {
             UI_Config.Save();
         }
 
-        public void LogFileInit()
-        {
-            string path = m_LogFileRecipeDirectionPath + m_LogFileNameHeader;
-
-            LogFileInitialization(path);
-        }
-
-        public void LogFileInitialization(string path)
+        /// <summary>
+        /// Initializes the log writer with paths for different types of logs.
+        /// </summary>
+        /// <param name="path">Base path for log files.</param>
+        public void InitializeLogFiles(string path)
         {
             LogWritter = new InfoMgr(path + "./GeneralLog", path + "./WarningLog", path + "./ErrorLog", path + "./DebugLog");
         }
 
-        private string TimeFormat(int mode, DateTime datetime)
+        /// <summary>
+        /// Handles log messages with options to print to console and rich text box.
+        /// </summary>
+        /// <param name="message">Message content.</param>
+        /// <param name="isPrintOnRichTextBox">Whether to display on UI rich text box.</param>
+        /// <param name="isPrintOnConsole">Whether to print to console.</param>
+        /// <param name="mode">Log level: General, Warning, Error, or Debug.</param>
+        public void HandleMessage(string message, bool isPrintOnRichTextBox, bool isPrintOnConsole, string mode = "Default" )
         {
-            string date;
-            string time;
-            string str;
-
             switch (mode)
             {
-                case 1:
-                    date = datetime.ToShortDateString();
-                    time = datetime.ToString("hh:mm:ss.FFF", CI).PadRight(12, '0');
-                    str = " [ " + date + " " + time + " ] : ";
-                    return str;
+                case "General":
+                    LogWritter.MsgGenLog(message);
+                    break;
 
-                case 2:
-                    str = datetime.Year.ToString() + "." + datetime.Month.ToString() + "." + datetime.Day.ToString() + "," + datetime.Hour.ToString() + "." + datetime.Minute.ToString() + "." + datetime.Second.ToString();
-                    return str;
+                case "Warning":
+                    LogWritter.MsgWarning(message);
+                    break;
 
-                case 3:
-                    date = datetime.ToShortDateString();
-                    time = datetime.ToString("hh:mm:ss.FFF", System.Globalization.CultureInfo.InvariantCulture).PadRight(12, '0');
-                    str = date + " " + time;
-                    return str;
+                case "Error":
+                    LogWritter.MsgError(message);
+                    break;
+
+                case "Debug":
+                    LogWritter.MsgDebug(message);
+                    break;
 
                 default:
-                    date = datetime.ToShortDateString();
-                    time = datetime.ToString("hh:mm:ss.FFF", System.Globalization.CultureInfo.InvariantCulture).PadRight(12, '0');
-                    str = " [ " + date + " " + time + " ] : ";
-                    return str;
+                    break;
             }
-        }
 
-        public void DoLog(string message, bool isPrintOnRichTextBox, bool isPrintOnConsole, string mode = "General" )
-        {
-            // todo
-
-            string m_DateTime = TimeFormat(1, DateTime.Now);
-
-            message = TimeFormat(1, DateTime.Now) + message;
+           message = $"[ {DateTime.Now:yyyy/M/d HH:mm:ss} ] " + message;
 
             if (isPrintOnRichTextBox)
             {
@@ -307,30 +307,13 @@ namespace UI
             {
                 Console.WriteLine(message);
             }
-
-                switch (mode)
-            {
-                case "General":
-                    break;
-
-                case "Warning":
-                    break;
-
-                case "Error":
-                    break;
-
-                default:
-                    break;
-            }
-
-            
         }
 #endregion
 
                 #region "UI"
         private void MainWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            Config_Save();
+            SaveConfig();
         }
 
         private void ImageBox_MouseMove(object sender, System.Windows.Forms.MouseEventArgs e)
@@ -476,16 +459,16 @@ namespace UI
                                 {
                                     if (Buffer_x12.AddImage(Buffer_x12.VisibleCount, "Source Image", new Image<Bgr, byte>(openFileDialog.FileName)))
                                     {
-                                        DoLog("完成圖檔開啟!", true, true, "General"); // todo
+                                        HandleMessage("完成圖檔開啟!", true, true, "General"); // todo
                                     }
                                     else
                                     {
-                                        DoLog("Buffer已滿", true, true, "General"); // todo
+                                        HandleMessage("Buffer已滿", true, true, "General"); // todo
                                     }
                                 }
                                 else
                                 {
-                                    DoLog("未完成圖檔開啟!", true, true, "General"); // todo
+                                    HandleMessage("未完成圖檔開啟!", true, true, "General"); // todo
                                 }
                             }
                             break;
@@ -499,11 +482,11 @@ namespace UI
                                 if (saveFileDialog.ShowDialog() == true && Buffer_x12.CurrentIndex >= 0 && Buffer_x12.CurrentIndex < Buffer_x12.VisibleCount)
                                 {
                                     Buffer_x12.GetImage(Buffer_x12.CurrentIndex).Save(saveFileDialog.FileName);
-                                    DoLog("完成圖檔儲存!", true, true, "General"); // todo
+                                    HandleMessage("完成圖檔儲存!", true, true, "General"); // todo
                                 }
                                 else
                                 {
-                                    DoLog("未完成圖檔儲存!", true, true, "General"); // todo
+                                    HandleMessage("未完成圖檔儲存!", true, true, "General"); // todo
                                 }
                             }
                             break;
@@ -511,7 +494,7 @@ namespace UI
                         case "Btn_Copy":
                             {
                                 Buffer_x12.AddImage(Buffer_x12.VisibleCount, "Copy Image", Buffer_x12.GetImage(Buffer_x12.CurrentIndex));
-                                DoLog("完成灰階!", true, true, "General"); // todo
+                                HandleMessage("完成灰階!", true, true, "General"); // todo
                             }
                             break;
 
@@ -520,28 +503,28 @@ namespace UI
                                 Buffer_x12.RemoveImage(Buffer_x12.CurrentIndex);
                                 Buffer_x12.ResetAllRadioButtons();
                                 ImageBox_Main.Image = Buffer_x12.GetImage(Buffer_x12.CurrentIndex);
-                                DoLog("Delete", true, true, "General"); // todo
+                                HandleMessage("Delete", true, true, "General"); // todo
                             }
                             break;
 
                         case "Btn_Gray":
                             {
                                 Buffer_x12.AddImage(Buffer_x12.VisibleCount, "Grayscale Image", BasicAlgorithm.ToBGR(BasicAlgorithm.ToGray(Buffer_x12.GetImage(Buffer_x12.CurrentIndex))));
-                                DoLog("完成灰階!", true, true, "General"); // todo
+                                HandleMessage("完成灰階!", true, true, "General"); // todo
                             }
                             break;
 
                         case "Btn_Dilation":
                             {
                                 Buffer_x12.AddImage(Buffer_x12.VisibleCount, "Dilated Image", BasicAlgorithm.ToBGR(BasicAlgorithm.ToDilation(BasicAlgorithm.ToGray(Buffer_x12.GetImage(Buffer_x12.CurrentIndex)))));
-                                DoLog("完成膨脹!", true, true, "General"); // todo
+                                HandleMessage("完成膨脹!", true, true, "General"); // todo
                             }
                             break;
 
                         case "Btn_Erosion":
                             {
                                 Buffer_x12.AddImage(Buffer_x12.VisibleCount, "Eroded Image", BasicAlgorithm.ToBGR(BasicAlgorithm.ToErosion(BasicAlgorithm.ToGray(Buffer_x12.GetImage(Buffer_x12.CurrentIndex)))));
-                                DoLog("完成侵蝕!", true, true, "General"); // todo
+                                HandleMessage("完成侵蝕!", true, true, "General"); // todo
                             }
                             break;
 
@@ -557,14 +540,14 @@ namespace UI
 
                         case "Btn_Reset":
                             {
-                                Restart();
+                                RestartApplication();
                             }
                             break;
 
                         case "test1":
                             {
                                 // todo
-                                Config_Save();
+                                SaveConfig();
                             }
                             break;
 
@@ -629,7 +612,7 @@ namespace UI
                             {
                                 UI_Config.parameters.Threshold = Convert.ToInt32((sender as System.Windows.Controls.Slider).Value);
                                 Buffer_x12.AddImage(Buffer_x12.VisibleCount, "Binary Image", BasicAlgorithm.ToBGR(BasicAlgorithm.ToBinarization(BasicAlgorithm.ToGray(Buffer_x12.GetImage(Buffer_x12.CurrentIndex)), new Gray(UI_Config.parameters.Threshold))));
-                                DoLog("完成二質化!", true, true, "General"); // todo
+                                HandleMessage("完成二質化!", true, true, "General"); // todo
                             }
                             break;
 
