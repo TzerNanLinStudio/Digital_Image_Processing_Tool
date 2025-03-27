@@ -71,7 +71,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BaseConfig.cs" />
-    <Compile Include="CustomConfig_IP.cs" />
     <Compile Include="CustomConfig_Example.cs" />
     <Compile Include="CustomConfig_UI.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

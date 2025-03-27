@@ -62,6 +62,22 @@ namespace UI
         public System.Drawing.Point ImageROI_CenterPoint;
         // --------------------------------------------------
 
+        // Variables for Config
+        // ---------------------------------------------------------------
+        public CustomConfig_UI UI_Config = new CustomConfig_UI();
+        private string m_RecipeDirectoryPath = System.Environment.CurrentDirectory + "/Appendix/Config/";
+        private string m_RecipeFilename = "UI";
+        private string m_RecipeSubtitle = ".dat";
+        private string m_RecipeFullPath = "";
+        // ---------------------------------------------------------------
+
+        // Variables for LogRecorder 
+        // ---------------------------------------------------------------
+        public InfoMgr LogWritter;
+        private string m_LogFileRecipeDirectionPath = System.Environment.CurrentDirectory + "/Appendix/Log/";
+        private string m_LogFileNameHeader = "UI";
+        // ---------------------------------------------------------------
+
         // Other Parameter
         // --------------------------------------------------
         public System.String CurrentDirectory = System.Environment.CurrentDirectory;
@@ -83,17 +99,19 @@ namespace UI
         }
 
         #region "Event"
-        private void Filter_Event(float[,] kernel, bool temp)
+        private void Filter_Event(float[][] kernel, bool temp)
         {
             try
             {
+                UI_Config.parameters.Kernel = kernel; // shallow copy
+
                 if (temp)
                 {
-                    ImageBox_Main.Image = BasicAlgorithm.ToBGR(BasicAlgorithm.ApplyCustomFilter(BasicAlgorithm.ToGray(Buffer_x12.GetImage(Buffer_x12.CurrentIndex)), kernel));
+                    ImageBox_Main.Image = BasicAlgorithm.ToBGR(BasicAlgorithm.ApplyCustomFilter(BasicAlgorithm.ToGray(Buffer_x12.GetImage(Buffer_x12.CurrentIndex)), UI_Config.parameters.Kernel));
                 }
                 else
                 {
-                    Buffer_x12.AddImage(Buffer_x12.VisibleCount, "Filter Image", BasicAlgorithm.ToBGR(BasicAlgorithm.ApplyCustomFilter(BasicAlgorithm.ToGray(Buffer_x12.GetImage(Buffer_x12.CurrentIndex)), kernel)));
+                    Buffer_x12.AddImage(Buffer_x12.VisibleCount, "Filter Image", BasicAlgorithm.ToBGR(BasicAlgorithm.ApplyCustomFilter(BasicAlgorithm.ToGray(Buffer_x12.GetImage(Buffer_x12.CurrentIndex)), UI_Config.parameters.Kernel)));
                     DoLog("完成濾波!", true, true, "General"); // todo
                 }
             }
@@ -122,16 +140,29 @@ namespace UI
             try
             {
                 // 暫時紀錄代辦任務，完成後即可刪除
-                Console.WriteLine("使用config紀錄UI參數-如3*3filter設定，像是影像處裡或是UI");
-                Console.WriteLine("使用log，但是gitignore得忽視存下的檔案");
+                Console.WriteLine("使用log");
                 Console.WriteLine("美化英文UI");
                 Console.WriteLine("完成基本英文註解");
                 Console.WriteLine("完成todo");
                 Console.WriteLine("清除不必要檔案");
 
                 EnsureDirectoriesExist();
+                Config_Init(true);
+                LogFileInitialization(m_LogFileRecipeDirectionPath + m_LogFileNameHeader);
 
-                Slide_Binarization.Value = 100;
+                LogWritter.MsgError("Exception Occured When Document Opened. Message : " ); // todo
+                LogWritter.MsgWarning("K1 Camera Thread Was Busy When PLC Triggered."); // todo
+                LogWritter.MsgGenLog("UI Had Been Locked."); // todo
+
+                Slide_Binarization.Value = UI_Config.parameters.Threshold;
+                for (int x = 0; x < Filter_3x3.StackPanel_NineSquare.Children.Count; x++)
+                {
+                    for (int y = 0; y < (Filter_3x3.StackPanel_NineSquare.Children[x] as StackPanel).Children.Count; y++)
+                    {
+                        ((Filter_3x3.StackPanel_NineSquare.Children[x] as StackPanel).Children[y] as Square).Text_Number.Text = UI_Config.parameters.Kernel[x][y].ToString();
+                    }
+                }
+
                 Filter_3x3.FilterHandleEvent += Filter_Event;
                 Buffer_x12.BufferHandleEvent += Buffer_Event;
 
@@ -192,6 +223,38 @@ namespace UI
                 System.IO.Directory.CreateDirectory(logPath);
                 System.Console.WriteLine("已創建 Log 資料夾");
             }
+        }
+
+        public void Config_Init(bool WhetherLoad)
+        {
+            m_RecipeFullPath = m_RecipeDirectoryPath + m_RecipeFilename + m_RecipeSubtitle;
+
+            UI_Config = new CustomConfig_UI(m_RecipeFullPath);
+
+            if (WhetherLoad)
+                Config_Load();
+        }
+
+        public void Config_Load()
+        {
+            if (UI_Config.Load() == false) return;
+        }
+
+        public void Config_Save()
+        {
+            UI_Config.Save();
+        }
+
+        public void LogFileInit()
+        {
+            string path = m_LogFileRecipeDirectionPath + m_LogFileNameHeader;
+
+            LogFileInitialization(path);
+        }
+
+        public void LogFileInitialization(string path)
+        {
+            LogWritter = new InfoMgr(path + "./GeneralLog", path + "./WarningLog", path + "./ErrorLog", path + "./DebugLog");
         }
 
         private string TimeFormat(int mode, DateTime datetime)
@@ -267,7 +330,7 @@ namespace UI
                 #region "UI"
         private void MainWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-
+            Config_Save();
         }
 
         private void ImageBox_MouseMove(object sender, System.Windows.Forms.MouseEventArgs e)
@@ -501,6 +564,7 @@ namespace UI
                         case "test1":
                             {
                                 // todo
+                                Config_Save();
                             }
                             break;
 
@@ -534,7 +598,8 @@ namespace UI
                     {
                         case "Slide_Binarization":
                             {
-                                ImageBox_Main.Image = BasicAlgorithm.ToBGR(BasicAlgorithm.ToBinarization(BasicAlgorithm.ToGray(Buffer_x12.GetImage(Buffer_x12.CurrentIndex)), new Gray(Convert.ToInt32(e.NewValue))));
+                                UI_Config.parameters.Threshold = Convert.ToInt32((sender as System.Windows.Controls.Slider).Value);
+                                ImageBox_Main.Image = BasicAlgorithm.ToBGR(BasicAlgorithm.ToBinarization(BasicAlgorithm.ToGray(Buffer_x12.GetImage(Buffer_x12.CurrentIndex)), new Gray(UI_Config.parameters.Threshold)));
                             }
                             break;
 
@@ -562,7 +627,8 @@ namespace UI
                     {
                         case "Slide_Binarization":
                             {
-                                Buffer_x12.AddImage(Buffer_x12.VisibleCount, "Binary Image", BasicAlgorithm.ToBGR(BasicAlgorithm.ToBinarization(BasicAlgorithm.ToGray(Buffer_x12.GetImage(Buffer_x12.CurrentIndex)), new Gray(Convert.ToInt32((sender as System.Windows.Controls.Slider).Value)))));
+                                UI_Config.parameters.Threshold = Convert.ToInt32((sender as System.Windows.Controls.Slider).Value);
+                                Buffer_x12.AddImage(Buffer_x12.VisibleCount, "Binary Image", BasicAlgorithm.ToBGR(BasicAlgorithm.ToBinarization(BasicAlgorithm.ToGray(Buffer_x12.GetImage(Buffer_x12.CurrentIndex)), new Gray(UI_Config.parameters.Threshold))));
                                 DoLog("完成二質化!", true, true, "General"); // todo
                             }
                             break;

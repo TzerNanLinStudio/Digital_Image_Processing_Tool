@@ -20,7 +20,8 @@ namespace UI
     /// </summary>
     public partial class Filter : UserControl
     {
-        public delegate void FilterHandler(float[,] kernel, bool temp);
+       // public delegate void FilterHandler(float[,] kernel, bool temp);
+        public delegate void FilterHandler(float[][] kernel, bool temp);
         public event FilterHandler FilterHandleEvent;
 
         public Filter()
@@ -44,22 +45,25 @@ namespace UI
 
         private void UpFilter(bool temp)
         {
-            // Initialize a 3x3 float array, assuming StackPanel is a 3x3 grid
-            float[,] kernel = new float[3, 3];
+            // Initialize a 3x3 jagged float array, assuming StackPanel is a 3x3 grid
+            float[][] kernel = new float[3][];
+            for (int x = 0; x < 3; x++)
+            {
+                kernel[x] = new float[3]; // Initialize each row
+            }
 
             for (int x = 0; x < StackPanel_NineSquare.Children.Count; x++)
             {
                 for (int y = 0; y < (StackPanel_NineSquare.Children[x] as StackPanel).Children.Count; y++)
                 {
                     string numberText = ((StackPanel_NineSquare.Children[x] as StackPanel).Children[y] as Square).Text_Number.Text;
-
                     if (float.TryParse(numberText, out float value))  // Convert string to float and store in kernel array
                     {
-                        kernel[x, y] = value;
+                        kernel[x][y] = value;
                     }
                     else  // Default to 0 if conversion fails
                     {
-                        kernel[x, y] = 0f;
+                        kernel[x][y] = 0f;
                     }
                 }
             }

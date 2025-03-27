@@ -89,7 +89,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Algorithm.cs" />
-    <Compile Include="Interface.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
@@ -112,6 +111,10 @@
     <ProjectReference Include="..\Config\Config.csproj">
       <Project>{60c16fc7-afa4-478a-b76f-1c7e9b04342b}</Project>
       <Name>Config</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\LogRecorder\LogRecorder.vcxproj">
+      <Project>{7662a689-1b73-464a-a98f-13bb336cdcf3}</Project>
+      <Name>LogRecorder</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup />

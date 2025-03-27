@@ -9,27 +9,27 @@ namespace Config
     public class CustomConfig_UI_Parameters
     {
         #region "Image Recording Parameter Declare"
-        private bool m_SaveOriginImage;
-        private bool m_SaveResultImage;
-        private int m_NumberOfImage;
-        private int m_SizeOfImage;
+        private int m_Threshold;
+        private float[][] m_Kernel;
         #endregion
 
         public CustomConfig_UI_Parameters()
         {
             #region "Image Recording Parameter Initialize"
-            m_SaveOriginImage = true;
-            m_SaveResultImage = true;
-            m_NumberOfImage = 50;
-            m_SizeOfImage = 50;
+            m_Threshold = 127;
+            m_Kernel = new float[][]  
+            {
+                new float[] { 0, -1, 0 },
+                new float[] { -1, 5, -1 },
+                new float[] { 0, -1, 0 }
+            };
             #endregion
         }
 
         #region "Image Recording Parameter Set Or Get"
-        public bool SaveOriginImage { get => m_SaveOriginImage; set => m_SaveOriginImage = value; }
-        public bool SaveResultImage { get => m_SaveResultImage; set => m_SaveResultImage = value; }
-        public int NumberOfImage { get => m_NumberOfImage; set => m_NumberOfImage = value; }
-        public int SizeOfImage { get => m_SizeOfImage; set => m_SizeOfImage = value; }
+        public int Threshold { get => m_Threshold; set => m_Threshold = value; }
+
+        public float[][] Kernel {   get => m_Kernel; set => m_Kernel = value;  }
         #endregion
 
         public object Clone()

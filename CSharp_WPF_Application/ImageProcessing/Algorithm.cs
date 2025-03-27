@@ -18,8 +18,7 @@ using Emgu.CV.OCR;
 using Emgu.CV.Structure;
 using Emgu.CV.Util;
 using Emgu.CV.CvEnum;
-using Config;
-//using LOGRECORDER;
+
 
 namespace ImageProcessing
 {
@@ -191,6 +190,61 @@ namespace ImageProcessing
             // Clean up
             kernelImage.Dispose();
 
+            return result;
+        }
+
+        /// <summary>
+        /// Applies a custom 3x3 filter to a grayscale image (compatible with most Emgu CV versions).
+        /// </summary>
+        /// <param name="sourceImage">The input grayscale image.</param>
+        /// <param name="kernel">The 3x3 filter kernel to apply.</param>
+        /// <param name="normalizeFactor">Optional factor to normalize the result. If 0, sum of kernel values is used.</param>
+        /// <param name="offset">Optional value to add to each pixel after filtering.</param>
+        /// <returns>The filtered grayscale image.</returns>
+        public static Image<Gray, byte> ApplyCustomFilter(Image<Gray, byte> sourceImage, float[][] kernel, float normalizeFactor = 0, float offset = 0)
+        {
+            // Validate parameters
+            if (sourceImage == null)
+                throw new ArgumentNullException(nameof(sourceImage));
+            if (kernel == null)
+                throw new ArgumentNullException(nameof(kernel));
+            if (kernel.Length != 3 || kernel[0].Length != 3 || kernel[1].Length != 3 || kernel[2].Length != 3)
+                throw new ArgumentException("Kernel must be a 3x3 matrix.", nameof(kernel));
+
+            // Calculate the normalization factor if not provided
+            if (normalizeFactor == 0)
+            {
+                float sum = 0;
+                for (int i = 0; i < 3; i++)
+                {
+                    for (int j = 0; j < 3; j++)
+                    {
+                        sum += kernel[i][j];
+                    }
+                }
+                normalizeFactor = sum != 0 ? sum : 1;
+            }
+
+            // Create the kernel matrix directly
+            Image<Gray, float> kernelImage = new Image<Gray, float>(3, 3);
+
+            // Fill the kernel values and apply normalization
+            for (int i = 0; i < 3; i++)
+            {
+                for (int j = 0; j < 3; j++)
+                {
+                    kernelImage[i, j] = new Gray(kernel[i][j] / normalizeFactor);
+                }
+            }
+
+            // Create the output image
+            Image<Gray, byte> result = sourceImage.Clone();
+
+            // Apply the filter using convolution
+            CvInvoke.Filter2D(sourceImage, result, kernelImage, new Point(-1, -1), offset, BorderType.Reflect);
+
+            // Clean up
+            kernelImage.Dispose();
             return result;
         }
 
