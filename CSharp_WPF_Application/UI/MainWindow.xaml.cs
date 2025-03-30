@@ -38,56 +38,64 @@ namespace UI
     /// </summary>
     public partial class MainWindow : Window
     {
+        #region "Enum"
+        public enum LogLevel
+        {
+            General,
+            Warning,
+            Error,
+            Debug,
+            None,
+        }
+        #endregion
+
         #region "Parameter"
-        // Initialization Parameter
+        // Common Parameter
         // --------------------------------------------------
-        public bool InitializationFlag = false;
-        // --------------------------------------------------
-
-        // Picture Box Selection Parameter
-        // --------------------------------------------------
-        public bool IsMouseDown = false;
-
-        public bool Selecting = false;
-        public System.Drawing.Rectangle rectPictureBox = System.Drawing.Rectangle.Empty;
-        public System.Drawing.Point StartPoint_PictureBox;
-        public System.Drawing.Point EndPoint_PictureBox;
-        public System.Drawing.Point CenterPoint_PictureBox;
-
-        public bool SelectFlexibleROI = false;
-        public bool SelectFixedROI = false;
-        public System.Drawing.Rectangle rectImageROI;
-        public System.Drawing.Point ImageROI_StartPoint;
-        public System.Drawing.Point ImageROI_EndPoint;
-        public System.Drawing.Point ImageROI_CenterPoint;
+        private const int RoiMode = 1;
+        private readonly System.String _currentDirectory = System.Environment.CurrentDirectory;
+        private bool _isInitialized = false;
         // --------------------------------------------------
 
-        // Variables for Config
-        // ---------------------------------------------------------------
-        public CustomConfig_UI UI_Config = new CustomConfig_UI();
-        private string m_RecipeDirectoryPath = System.Environment.CurrentDirectory + "/Appendix/Config/";
-        private string m_RecipeFilename = "UI";
-        private string m_RecipeSubtitle = ".dat";
-        private string m_RecipeFullPath = "";
-        // ---------------------------------------------------------------
+        // PictureBox Selection Parameter
+        // --------------------------------------------------
+        private bool _isMouseDown = false;
+        private bool _isSelecting = false;
+        private bool _isFlexibleRoiSelected = false;
+        private bool _isFixedRoiSelected = false;
 
-        // Variables for LogRecorder 
-        // ---------------------------------------------------------------
+        private System.Drawing.Rectangle _pictureBoxRectangle = System.Drawing.Rectangle.Empty;
+        private System.Drawing.Point _pictureBoxStartPoin;
+        private System.Drawing.Point _pictureBoxEndPoint;
+        private System.Drawing.Point _pictureBoxCenterPoint;
+
+        private System.Drawing.Rectangle _imageRoiRectangle;
+        private System.Drawing.Point _imageRoiStartPoint;
+        private System.Drawing.Point _imageRoiEndPoint;
+        private System.Drawing.Point _imageRoiCenterPoint;
+        // --------------------------------------------------
+
+        // Config Parameter
+        // --------------------------------------------------
+        public CustomConfig_UI UiConfig = new CustomConfig_UI();
+        private string _recipeDirectoryPath = System.Environment.CurrentDirectory + "/Appendix/Config/";
+        private string _recipeFileName = "UI";
+        private string _recipeFileExtension = ".dat";
+        private string _recipeFullPath = "";
+        // --------------------------------------------------
+
+        // LogRecorder Parameter
+        // --------------------------------------------------
         public InfoMgr LogWritter;
-        private string m_LogFileRecipeDirectionPath = System.Environment.CurrentDirectory + "/Appendix/Log/";
-        private string m_LogFileNameHeader = "UI";
-        // ---------------------------------------------------------------
-
-        // Other Parameter
-        // --------------------------------------------------
-        public System.String CurrentDirectory = System.Environment.CurrentDirectory;
+        private string _logFileDirectoryPath = System.Environment.CurrentDirectory + "/Appendix/Log/";
+        private string _logFileNamePrefix = "UI";
         // --------------------------------------------------
 
         // Debug Parameter
         // --------------------------------------------------
-        private static Thread DebugThread;
-        public bool[] DebugFlag = new bool[5] { true, true, false, false, false };
-        public Stopwatch[] DebugWatch = new Stopwatch[5] { new Stopwatch(), new Stopwatch(), new Stopwatch(), new Stopwatch(), new Stopwatch() };
+        public static Thread DebugThread;
+        public bool[] DebugFlags = new bool[5] { false, false, false, false, false };
+        public Stopwatch[] DebugStopwatches = new Stopwatch[5] { new Stopwatch(), new Stopwatch(), new Stopwatch(), new Stopwatch(), new Stopwatch() };
         // --------------------------------------------------
         #endregion
 
@@ -102,21 +110,28 @@ namespace UI
         {
             try
             {
-                UI_Config.parameters.Kernel = kernel; // shallow copy
+                UiConfig.parameters.Kernel = kernel; // Update kernel parameters (shallow copy)
+
+                var filteredImage = BasicAlgorithm.ApplyCustomFilter(
+                                        BasicAlgorithm.ToGray(
+                                            Buffer_x12.GetImage(
+                                                Buffer_x12.CurrentIndex)), 
+                                        UiConfig.parameters.Kernel);
 
                 if (temp)
                 {
-                    ImageBox_Main.Image = BasicAlgorithm.ToBGR(BasicAlgorithm.ApplyCustomFilter(BasicAlgorithm.ToGray(Buffer_x12.GetImage(Buffer_x12.CurrentIndex)), UI_Config.parameters.Kernel));
+                    ImageBox_Main.Image = BasicAlgorithm.ToBGR(filteredImage);
+                    HandleMessage("Temporary filter applied and displayed on main image.", false, false, true, LogLevel.General);
                 }
                 else
                 {
-                    Buffer_x12.AddImage(Buffer_x12.VisibleCount, "Filter Image", BasicAlgorithm.ToBGR(BasicAlgorithm.ApplyCustomFilter(BasicAlgorithm.ToGray(Buffer_x12.GetImage(Buffer_x12.CurrentIndex)), UI_Config.parameters.Kernel)));
-                    HandleMessage("完成濾波!", true, true, "General"); // todo
+                    Buffer_x12.AddImage(Buffer_x12.VisibleCount, "Filtered Image", BasicAlgorithm.ToBGR(filteredImage));
+                    HandleMessage("Filtered image successfully added to buffer.", false, true, true, LogLevel.General);
                 }
             }
-            catch (Exception Ex)
+            catch (Exception ex)
             {
-                Console.WriteLine(Ex.Message); // todo
+                HandleMessage("Error occurred while applying filter: " + ex.Message, false, true, true, LogLevel.Error);
             }
         }
 
@@ -125,10 +140,11 @@ namespace UI
             try
             {
                 ImageBox_Main.Image = Buffer_x12.GetImage(index);
+                HandleMessage($"Image at index {index} successfully loaded.", false, false, true, LogLevel.General);
             }
-            catch (Exception Ex)
+            catch (Exception ex)
             {
-                Console.WriteLine(Ex.Message); // todo
+                HandleMessage($"Failed to load image from buffer: {ex.Message}", false, true, true, LogLevel.Error);
             }
         }
         #endregion
@@ -143,33 +159,33 @@ namespace UI
             try
             {
                 // 暫時紀錄代辦任務，完成後即可刪除
-                Console.WriteLine("完全使用log");
                 Console.WriteLine("美化英文UI");
+                Console.WriteLine("無config檔案使用預設");
                 Console.WriteLine("完成基本英文註解");
                 Console.WriteLine("完成todo");
                 Console.WriteLine("清除不必要檔案");
 
                 EnsureDirectoriesExist();
                 InitializeConfig(true);
-                InitializeLogFiles(m_LogFileRecipeDirectionPath + m_LogFileNameHeader);
+                InitializeLogFiles(_logFileDirectoryPath + _logFileNamePrefix);
 
-                Slide_Binarization.Value = UI_Config.parameters.Threshold;
+                Slide_Binarization.Value = UiConfig.parameters.Threshold;
                 for (int x = 0; x < Filter_3x3.StackPanel_NineSquare.Children.Count; x++)
                 {
                     for (int y = 0; y < (Filter_3x3.StackPanel_NineSquare.Children[x] as StackPanel).Children.Count; y++)
                     {
-                        ((Filter_3x3.StackPanel_NineSquare.Children[x] as StackPanel).Children[y] as Square).Text_Number.Text = UI_Config.parameters.Kernel[x][y].ToString();
+                        ((Filter_3x3.StackPanel_NineSquare.Children[x] as StackPanel).Children[y] as Square).Text_Number.Text = UiConfig.parameters.Kernel[x][y].ToString();
                     }
                 }
 
                 Filter_3x3.FilterHandleEvent += Filter_Event;
                 Buffer_x12.BufferHandleEvent += Buffer_Event;
 
-                InitializationFlag = true;
+                _isInitialized = true;
             }
-            catch (Exception EX)
+            catch (Exception ex)
             {
-                Console.WriteLine(EX.Message);
+                Console.WriteLine(ex.Message);
             }
         }
 
@@ -180,12 +196,9 @@ namespace UI
         {
             Close();
 
-            System.Threading.Thread thtmp = new System.Threading.Thread(new
-            System.Threading.ParameterizedThreadStart(RunApplication));
-
-            object appName = System.Windows.Forms.Application.ExecutablePath;
+            System.Threading.Thread tmp = new System.Threading.Thread(new System.Threading.ParameterizedThreadStart(RunApplication));
             System.Threading.Thread.Sleep(2000);
-            thtmp.Start(appName);
+            tmp.Start(System.Windows.Forms.Application.ExecutablePath);
         }
 
         /// <summary>
@@ -204,7 +217,7 @@ namespace UI
         /// </summary>
         public void EnsureDirectoriesExist()
         {
-            string currentDirectory = CurrentDirectory;
+            string currentDirectory = _currentDirectory;
             string appendixPath = System.IO.Path.Combine(currentDirectory, "Appendix");
             string configPath = System.IO.Path.Combine(appendixPath, "Config");
             string logPath = System.IO.Path.Combine(appendixPath, "Log");
@@ -228,15 +241,14 @@ namespace UI
         /// <summary>
         /// Initializes configuration data from file. Optionally loads values into the UI.
         /// </summary>
-        /// <param name="WhetherLoad">If true, loads configuration into the UI after initialization.</param>
-        public void InitializeConfig(bool WhetherLoad)
+        /// <param name="isLoaded">If true, loads configuration into the UI after initialization.</param>
+        public void InitializeConfig(bool isLoaded)
         {
-            m_RecipeFullPath = m_RecipeDirectoryPath + m_RecipeFilename + m_RecipeSubtitle;
+            _recipeFullPath = _recipeDirectoryPath + _recipeFileName + _recipeFileExtension;
 
-            UI_Config = new CustomConfig_UI(m_RecipeFullPath);
+            UiConfig = new CustomConfig_UI(_recipeFullPath);
 
-            if (WhetherLoad)
-                LoadConfig();
+            if (isLoaded) LoadConfig();
         }
 
         /// <summary>
@@ -244,7 +256,7 @@ namespace UI
         /// </summary>
         public void LoadConfig()
         {
-            if (UI_Config.Load() == false) return;
+            if (UiConfig.Load() == false) return;
         }
        
         /// <summary>
@@ -252,7 +264,7 @@ namespace UI
         /// </summary>
         public void SaveConfig()
         {
-            UI_Config.Save();
+            UiConfig.Save();
         }
 
         /// <summary>
@@ -265,29 +277,30 @@ namespace UI
         }
 
         /// <summary>
-        /// Handles log messages with options to print to console and rich text box.
+        /// Handles log messages with options to print to message box, rich text box, or console.
         /// </summary>
         /// <param name="message">Message content.</param>
+        /// <param name="isShowedOnMessageBox">Whether to display on Windows message box.</param>
         /// <param name="isPrintOnRichTextBox">Whether to display on UI rich text box.</param>
         /// <param name="isPrintOnConsole">Whether to print to console.</param>
         /// <param name="mode">Log level: General, Warning, Error, or Debug.</param>
-        public void HandleMessage(string message, bool isPrintOnRichTextBox, bool isPrintOnConsole, string mode = "Default" )
+        public void HandleMessage(string message, bool isShowedOnMessageBox, bool isPrintOnRichTextBox, bool isPrintOnConsole, LogLevel mode = LogLevel.None)
         {
             switch (mode)
             {
-                case "General":
+                case LogLevel.General:
                     LogWritter.MsgGenLog(message);
                     break;
 
-                case "Warning":
+                case LogLevel.Warning:
                     LogWritter.MsgWarning(message);
                     break;
 
-                case "Error":
+                case LogLevel.Error:
                     LogWritter.MsgError(message);
                     break;
 
-                case "Debug":
+                case LogLevel.Debug:
                     LogWritter.MsgDebug(message);
                     break;
 
@@ -295,7 +308,12 @@ namespace UI
                     break;
             }
 
-           message = $"[ {DateTime.Now:yyyy/M/d HH:mm:ss} ] " + message;
+            if (isShowedOnMessageBox)
+            {
+                System.Windows.MessageBox.Show(message);
+            }
+
+            message = $"[ {DateTime.Now:yyyy/M/d HH:mm:ss} ] " + message;
 
             if (isPrintOnRichTextBox)
             {
@@ -308,9 +326,9 @@ namespace UI
                 Console.WriteLine(message);
             }
         }
-#endregion
+        #endregion
 
-                #region "UI"
+        #region "UI"
         private void MainWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
             SaveConfig();
@@ -325,50 +343,50 @@ namespace UI
                     return;
                 }
 
-                if (Selecting && IsMouseDown)
+                if (_isSelecting && _isMouseDown)
                 {
-                    if (Selecting && IsMouseDown && SelectFlexibleROI)
+                    if (_isSelecting && _isMouseDown && _isFlexibleRoiSelected)
                     {
-                        int x = Math.Min(StartPoint_PictureBox.X, e.X);
-                        int y = Math.Min(StartPoint_PictureBox.Y, e.Y);
-                        int width = Math.Max(StartPoint_PictureBox.X, e.X) - Math.Min(StartPoint_PictureBox.X, e.X);
-                        int height = Math.Max(StartPoint_PictureBox.Y, e.Y) - Math.Min(StartPoint_PictureBox.Y, e.Y);
+                        int x = Math.Min(_pictureBoxStartPoin.X, e.X);
+                        int y = Math.Min(_pictureBoxStartPoin.Y, e.Y);
+                        int width = Math.Max(_pictureBoxStartPoin.X, e.X) - Math.Min(_pictureBoxStartPoin.X, e.X);
+                        int height = Math.Max(_pictureBoxStartPoin.Y, e.Y) - Math.Min(_pictureBoxStartPoin.Y, e.Y);
 
-                        rectPictureBox = new System.Drawing.Rectangle(x, y, width, height);
+                        _pictureBoxRectangle = new System.Drawing.Rectangle(x, y, width, height);
                         ImageBox_Main.Refresh();
                     }
 
-                    if (Selecting && IsMouseDown && SelectFixedROI)
+                    if (_isSelecting && _isMouseDown && _isFixedRoiSelected)
                     {
-                        CenterPoint_PictureBox = new System.Drawing.Point(e.X, e.Y);
+                        _pictureBoxCenterPoint = new System.Drawing.Point(e.X, e.Y);
                         ImageBox_Main.Refresh();
                     }
                 }
             }
             catch (Exception ex)
             {
-                System.Windows.MessageBox.Show(ex.Message);
+                HandleMessage($"Mouse move error: {ex.Message}", false, true, true, LogLevel.Error);
             }
         }
 
         private void ImageBox_MouseDown(object sender, System.Windows.Forms.MouseEventArgs e)
         {
-            if (Selecting == true)
+            if (_isSelecting == true)
             {
-                IsMouseDown = true;
+                _isMouseDown = true;
 
-                StartPoint_PictureBox = e.Location;
+                _pictureBoxStartPoin = e.Location;
             }
 
-            if (SelectFlexibleROI)
+            if (_isFlexibleRoiSelected)
             {
-                ImageROI_StartPoint.X = (int)((e.Location.X) * (float)(Buffer_x12.GetImage(Buffer_x12.CurrentIndex).Width) / ((sender as ImageBox).Width - 1));
-                ImageROI_StartPoint.Y = (int)((e.Location.Y) * (float)(Buffer_x12.GetImage(Buffer_x12.CurrentIndex).Height) / ((sender as ImageBox).Height - 1));
+                _imageRoiStartPoint.X = (int)((e.Location.X) * (float)(Buffer_x12.GetImage(Buffer_x12.CurrentIndex).Width) / ((sender as ImageBox).Width - 1));
+                _imageRoiStartPoint.Y = (int)((e.Location.Y) * (float)(Buffer_x12.GetImage(Buffer_x12.CurrentIndex).Height) / ((sender as ImageBox).Height - 1));
             }
 
-            if (SelectFixedROI)
+            if (_isFixedRoiSelected)
             {
-                CenterPoint_PictureBox = new System.Drawing.Point(e.X, e.Y);
+                _pictureBoxCenterPoint = new System.Drawing.Point(e.X, e.Y);
 
                 ImageBox_Main.Refresh();
             }
@@ -376,65 +394,67 @@ namespace UI
 
         private void ImageBox_MouseUp(object sender, System.Windows.Forms.MouseEventArgs e)
         {
-            if (Selecting)
+            if (_isSelecting)
             {
-                Selecting = false;
-                IsMouseDown = false;
-                EndPoint_PictureBox = e.Location;
+                _isSelecting = false;
+                _isMouseDown = false;
+                _pictureBoxEndPoint = e.Location;
             }
 
-            if (SelectFlexibleROI)
+            if (_isFlexibleRoiSelected)
             {
-                SelectFlexibleROI = false;
-                IsMouseDown = false;
+                _isFlexibleRoiSelected = false;
+                _isMouseDown = false;
 
-                ImageROI_EndPoint.X = (int)((e.Location.X) * (float)(Buffer_x12.GetImage(Buffer_x12.CurrentIndex).Width) / ((sender as ImageBox).Width - 1));
-                ImageROI_EndPoint.Y = (int)((e.Location.Y) * (float)(Buffer_x12.GetImage(Buffer_x12.CurrentIndex).Height) / ((sender as ImageBox).Height - 1));
+                _imageRoiEndPoint.X = (int)((e.Location.X) * (float)(Buffer_x12.GetImage(Buffer_x12.CurrentIndex).Width) / ((sender as ImageBox).Width - 1));
+                _imageRoiEndPoint.Y = (int)((e.Location.Y) * (float)(Buffer_x12.GetImage(Buffer_x12.CurrentIndex).Height) / ((sender as ImageBox).Height - 1));
 
-                int x = Math.Min(ImageROI_StartPoint.X, ImageROI_EndPoint.X);
-                int y = Math.Min(ImageROI_StartPoint.Y, ImageROI_EndPoint.Y);
-                int width = Math.Abs(ImageROI_StartPoint.X - ImageROI_EndPoint.X);
-                int height = Math.Abs(ImageROI_StartPoint.Y - ImageROI_EndPoint.Y);
+                int x = Math.Min(_imageRoiStartPoint.X, _imageRoiEndPoint.X);
+                int y = Math.Min(_imageRoiStartPoint.Y, _imageRoiEndPoint.Y);
+                int width = Math.Abs(_imageRoiStartPoint.X - _imageRoiEndPoint.X);
+                int height = Math.Abs(_imageRoiStartPoint.Y - _imageRoiEndPoint.Y);
 
-                rectImageROI = new System.Drawing.Rectangle(x, y, width, height);
-                Buffer_x12.AddImage(Buffer_x12.VisibleCount, "ROI Image", BasicAlgorithm.GetROI(Buffer_x12.GetImage(Buffer_x12.CurrentIndex), rectImageROI));
+                _imageRoiRectangle = new System.Drawing.Rectangle(x, y, width, height);
+                Buffer_x12.AddImage(Buffer_x12.VisibleCount, "ROI Image", BasicAlgorithm.GetROI(Buffer_x12.GetImage(Buffer_x12.CurrentIndex), _imageRoiRectangle));
+                HandleMessage("ROI image successfully added to buffer.", false, true, true, LogLevel.General);
             }
 
-            if (SelectFixedROI)
+            if (_isFixedRoiSelected)
             {
-                SelectFixedROI = false;
-                IsMouseDown = false;
+                _isFixedRoiSelected = false;
+                _isMouseDown = false;
 
-                ImageROI_CenterPoint.X = (int)((e.Location.X) * (float)(Buffer_x12.GetImage(Buffer_x12.CurrentIndex).Width) / ((sender as ImageBox).Width - 1));
-                ImageROI_CenterPoint.Y = (int)((e.Location.Y) * (float)(Buffer_x12.GetImage(Buffer_x12.CurrentIndex).Height) / ((sender as ImageBox).Height - 1));
+                _imageRoiCenterPoint.X = (int)((e.Location.X) * (float)(Buffer_x12.GetImage(Buffer_x12.CurrentIndex).Width) / ((sender as ImageBox).Width - 1));
+                _imageRoiCenterPoint.Y = (int)((e.Location.Y) * (float)(Buffer_x12.GetImage(Buffer_x12.CurrentIndex).Height) / ((sender as ImageBox).Height - 1));
 
                 int x = (int)((e.Location.X - 60) * (float)(Buffer_x12.GetImage(Buffer_x12.CurrentIndex).Width) / ((sender as ImageBox).Width - 1));
                 int y = (int)((e.Location.Y - 60) * (float)(Buffer_x12.GetImage(Buffer_x12.CurrentIndex).Height) / ((sender as ImageBox).Height - 1));
                 int width = (int)((120) * (float)(Buffer_x12.GetImage(Buffer_x12.CurrentIndex).Width) / ((sender as ImageBox).Width - 1));
                 int height = (int)((120) * (float)(Buffer_x12.GetImage(Buffer_x12.CurrentIndex).Height) / ((sender as ImageBox).Height - 1));
 
-                rectImageROI = new System.Drawing.Rectangle(x, y, width, height);
-                Buffer_x12.AddImage(Buffer_x12.VisibleCount, "ROI Image", BasicAlgorithm.GetROI(Buffer_x12.GetImage(Buffer_x12.CurrentIndex), rectImageROI));
+                _imageRoiRectangle = new System.Drawing.Rectangle(x, y, width, height);
+                Buffer_x12.AddImage(Buffer_x12.VisibleCount, "ROI Image", BasicAlgorithm.GetROI(Buffer_x12.GetImage(Buffer_x12.CurrentIndex), _imageRoiRectangle));
+                HandleMessage("ROI image successfully added to buffer.", false, true, true, LogLevel.General);
             }
         }
 
         private void ImageBox_Paint(object sender, System.Windows.Forms.PaintEventArgs e)
         {
-            if (IsMouseDown)
+            if (_isMouseDown)
             {
-                if (SelectFlexibleROI)
+                if (_isFlexibleRoiSelected)
                 {
                     using (System.Drawing.Pen pen = new System.Drawing.Pen(System.Drawing.Color.Red, 2))
                     {
-                        e.Graphics.DrawRectangle(pen, rectPictureBox);
+                        e.Graphics.DrawRectangle(pen, _pictureBoxRectangle);
                     }
                 }
 
-                if (SelectFixedROI)
+                if (_isFixedRoiSelected)
                 {
                     using (System.Drawing.Pen pen = new System.Drawing.Pen(System.Drawing.Color.Red, 2))
                     {
-                        e.Graphics.DrawRectangle(pen, new System.Drawing.Rectangle(CenterPoint_PictureBox.X - 60, CenterPoint_PictureBox.Y - 60, 120, 120));
+                        e.Graphics.DrawRectangle(pen, new System.Drawing.Rectangle(_pictureBoxCenterPoint.X - 60, _pictureBoxCenterPoint.Y - 60, 120, 120));
                     }
                 }
             }
@@ -444,7 +464,7 @@ namespace UI
         {
             try
             {
-                if (InitializationFlag)
+                if (_isInitialized)
                 {
                     switch ((sender as System.Windows.Controls.Button).Name)
                     {
@@ -459,16 +479,16 @@ namespace UI
                                 {
                                     if (Buffer_x12.AddImage(Buffer_x12.VisibleCount, "Source Image", new Image<Bgr, byte>(openFileDialog.FileName)))
                                     {
-                                        HandleMessage("完成圖檔開啟!", true, true, "General"); // todo
+                                        HandleMessage("Image opened successfully.", false, true, true, LogLevel.General);   
                                     }
                                     else
                                     {
-                                        HandleMessage("Buffer已滿", true, true, "General"); // todo
+                                        HandleMessage("Buffer is full.", false, true, true, LogLevel.Warning); 
                                     }
                                 }
                                 else
                                 {
-                                    HandleMessage("未完成圖檔開啟!", true, true, "General"); // todo
+                                    HandleMessage("Image opening canceled.", false, true, true, LogLevel.Warning); 
                                 }
                             }
                             break;
@@ -479,62 +499,99 @@ namespace UI
 
                                 saveFileDialog.Filter = ".bmp|*.bmp";
 
-                                if (saveFileDialog.ShowDialog() == true && Buffer_x12.CurrentIndex >= 0 && Buffer_x12.CurrentIndex < Buffer_x12.VisibleCount)
+                                if (saveFileDialog.ShowDialog() == true)
                                 {
-                                    Buffer_x12.GetImage(Buffer_x12.CurrentIndex).Save(saveFileDialog.FileName);
-                                    HandleMessage("完成圖檔儲存!", true, true, "General"); // todo
+                                    if (Buffer_x12.CurrentIndex >= 0 && Buffer_x12.CurrentIndex < Buffer_x12.VisibleCount)
+                                    {
+                                        Buffer_x12.GetImage(Buffer_x12.CurrentIndex).Save(saveFileDialog.FileName);
+                                        HandleMessage("Image saved successfully.", false, true, true, LogLevel.General);
+                                    }
+                                    else
+                                    {
+                                        HandleMessage("Buffer is empty.", false, true, true, LogLevel.Warning);
+                                    }
                                 }
                                 else
                                 {
-                                    HandleMessage("未完成圖檔儲存!", true, true, "General"); // todo
+                                    HandleMessage("Image saving canceled.", false, true, true, LogLevel.Warning);
                                 }
                             }
                             break;
 
                         case "Btn_Copy":
                             {
-                                Buffer_x12.AddImage(Buffer_x12.VisibleCount, "Copy Image", Buffer_x12.GetImage(Buffer_x12.CurrentIndex));
-                                HandleMessage("完成灰階!", true, true, "General"); // todo
+                                if (Buffer_x12.AddImage(Buffer_x12.VisibleCount, "Copy Image", Buffer_x12.GetImage(Buffer_x12.CurrentIndex)))
+                                {
+                                    HandleMessage("Copy image successfully added to buffer.", false, true, true, LogLevel.General);
+                                }
+                                else
+                                {
+                                    HandleMessage("Buffer is full.", false, true, true, LogLevel.Warning);
+                                }
                             }
                             break;
 
                         case "Btn_Delete":
                             {
-                                Buffer_x12.RemoveImage(Buffer_x12.CurrentIndex);
-                                Buffer_x12.ResetAllRadioButtons();
-                                ImageBox_Main.Image = Buffer_x12.GetImage(Buffer_x12.CurrentIndex);
-                                HandleMessage("Delete", true, true, "General"); // todo
+                                if (Buffer_x12.RemoveImage(Buffer_x12.CurrentIndex))
+                                {
+                                    Buffer_x12.ResetAllRadioButtons();
+                                    ImageBox_Main.Image = Buffer_x12.GetImage(Buffer_x12.CurrentIndex);
+                                    HandleMessage("Succeeded to delete image.", false, true, true, LogLevel.General);
+                                }
+                                else
+                                {
+                                    HandleMessage("Failed to delete image.", false, true, true, LogLevel.General);
+                                }
                             }
                             break;
 
                         case "Btn_Gray":
                             {
-                                Buffer_x12.AddImage(Buffer_x12.VisibleCount, "Grayscale Image", BasicAlgorithm.ToBGR(BasicAlgorithm.ToGray(Buffer_x12.GetImage(Buffer_x12.CurrentIndex))));
-                                HandleMessage("完成灰階!", true, true, "General"); // todo
+                                if (Buffer_x12.AddImage(Buffer_x12.VisibleCount, "Grayscale Image", BasicAlgorithm.ToBGR(BasicAlgorithm.ToGray(Buffer_x12.GetImage(Buffer_x12.CurrentIndex)))))
+                                {
+                                    HandleMessage("Grayscale image successfully added to buffer.", false, true, true, LogLevel.General);
+                                }
+                                else
+                                {
+                                    HandleMessage("Buffer is full.", false, true, true, LogLevel.Warning);
+                                }
                             }
                             break;
 
                         case "Btn_Dilation":
                             {
-                                Buffer_x12.AddImage(Buffer_x12.VisibleCount, "Dilated Image", BasicAlgorithm.ToBGR(BasicAlgorithm.ToDilation(BasicAlgorithm.ToGray(Buffer_x12.GetImage(Buffer_x12.CurrentIndex)))));
-                                HandleMessage("完成膨脹!", true, true, "General"); // todo
+                                if (Buffer_x12.AddImage(Buffer_x12.VisibleCount, "Dilated Image", BasicAlgorithm.ToBGR(BasicAlgorithm.ToDilation(BasicAlgorithm.ToGray(Buffer_x12.GetImage(Buffer_x12.CurrentIndex))))))
+                                {
+                                    HandleMessage("Dilated image successfully added to buffer.", false, true, true, LogLevel.General);
+                                }
+                                else
+                                {
+                                    HandleMessage("Buffer is full.", false, true, true, LogLevel.Warning);
+                                }
                             }
                             break;
 
                         case "Btn_Erosion":
                             {
-                                Buffer_x12.AddImage(Buffer_x12.VisibleCount, "Eroded Image", BasicAlgorithm.ToBGR(BasicAlgorithm.ToErosion(BasicAlgorithm.ToGray(Buffer_x12.GetImage(Buffer_x12.CurrentIndex)))));
-                                HandleMessage("完成侵蝕!", true, true, "General"); // todo
+                                if (Buffer_x12.AddImage(Buffer_x12.VisibleCount, "Eroded Image", BasicAlgorithm.ToBGR(BasicAlgorithm.ToErosion(BasicAlgorithm.ToGray(Buffer_x12.GetImage(Buffer_x12.CurrentIndex))))))
+                                {
+                                    HandleMessage("Eroded image successfully added to buffer.", false, true, true, LogLevel.General);
+                                }
+                                else
+                                {
+                                    HandleMessage("Buffer is full.", false, true, true, LogLevel.Warning);
+                                }
                             }
                             break;
 
                         case "Btn_ROI":
                             {
-                                if (0 == 0)
-                                    SelectFlexibleROI = true; // ROI Option 1
-                                else
-                                    SelectFixedROI = true; // ROI Option 2
-                                Selecting = true;
+                                if (RoiMode == 1)
+                                    _isFlexibleRoiSelected = true;
+                                else if (RoiMode == 2)
+                                    _isFixedRoiSelected = true;
+                                _isSelecting = true;
                             }
                             break;
 
@@ -544,30 +601,17 @@ namespace UI
                             }
                             break;
 
-                        case "test1":
-                            {
-                                // todo
-                                SaveConfig();
-                            }
-                            break;
-
-                        case "test2":
-                            {
-                                // todo
-                            }
-                            break;
-
                         default:
                             {
-
+                                HandleMessage("Unknown button control activated in Btn_Clickn. Please check event handlers.", false, true, true, LogLevel.Error);
                             }
                             break;
                     }
                 }
             }
-            catch (Exception Ex)
+            catch (Exception ex)
             {
-                Console.WriteLine("Exception Occurred When Button Clicked. Message:" + Ex.Message);
+                HandleMessage($"Unexpected error occurred: {ex.Message}", false, true, true, LogLevel.Error);
             }
         }
 
@@ -575,28 +619,29 @@ namespace UI
         {
             try
             {
-                if (InitializationFlag)
+                if (_isInitialized)
                 {
                     switch ((sender as System.Windows.Controls.Slider).Name)
                     {
                         case "Slide_Binarization":
                             {
-                                UI_Config.parameters.Threshold = Convert.ToInt32((sender as System.Windows.Controls.Slider).Value);
-                                ImageBox_Main.Image = BasicAlgorithm.ToBGR(BasicAlgorithm.ToBinarization(BasicAlgorithm.ToGray(Buffer_x12.GetImage(Buffer_x12.CurrentIndex)), new Gray(UI_Config.parameters.Threshold)));
+                                UiConfig.parameters.Threshold = Convert.ToInt32((sender as System.Windows.Controls.Slider).Value);
+                                ImageBox_Main.Image = BasicAlgorithm.ToBGR(BasicAlgorithm.ToBinarization(BasicAlgorithm.ToGray(Buffer_x12.GetImage(Buffer_x12.CurrentIndex)), new Gray(UiConfig.parameters.Threshold)));
+                                HandleMessage("Temporary binarization applied and displayed on main image.", false, false, true, LogLevel.General);
                             }
                             break;
 
                         default:
                             {
-
+                                HandleMessage("Unknown slider control activated in Slide_ValueChanged. Please check event handlers.", false, true, true, LogLevel.Error); 
                             }
                             break;
                     }
                 }
             }
-            catch (Exception Ex)
+            catch (Exception ex)
             {
-
+                HandleMessage($"Unexpected error occurred: {ex.Message}", false, true, true, LogLevel.Error);
             }
         }
 
@@ -604,29 +649,35 @@ namespace UI
         {
             try
             {
-                if (InitializationFlag)
+                if (_isInitialized)
                 {
                     switch ((sender as System.Windows.Controls.Slider).Name)
                     {
                         case "Slide_Binarization":
                             {
-                                UI_Config.parameters.Threshold = Convert.ToInt32((sender as System.Windows.Controls.Slider).Value);
-                                Buffer_x12.AddImage(Buffer_x12.VisibleCount, "Binary Image", BasicAlgorithm.ToBGR(BasicAlgorithm.ToBinarization(BasicAlgorithm.ToGray(Buffer_x12.GetImage(Buffer_x12.CurrentIndex)), new Gray(UI_Config.parameters.Threshold))));
-                                HandleMessage("完成二質化!", true, true, "General"); // todo
+                                UiConfig.parameters.Threshold = Convert.ToInt32((sender as System.Windows.Controls.Slider).Value);
+                                if (Buffer_x12.AddImage(Buffer_x12.VisibleCount, "Binary Image", BasicAlgorithm.ToBGR(BasicAlgorithm.ToBinarization(BasicAlgorithm.ToGray(Buffer_x12.GetImage(Buffer_x12.CurrentIndex)), new Gray(UiConfig.parameters.Threshold)))))
+                                {
+                                    HandleMessage("Binarized image successfully added to buffer.", false, true, true, LogLevel.General);
+                                }
+                                else
+                                {
+                                    HandleMessage("Buffer is full.", false, true, true, LogLevel.Warning);
+                                }
                             }
                             break;
 
                         default:
                             {
-
+                                HandleMessage("Unknown slider control activated in Slide_MouseRightButtonDown. Please check event handlers.", false, true, true, LogLevel.Error); 
                             }
                             break;
                     }
                 }
             }
-            catch (Exception Ex)
+            catch (Exception ex)
             {
-
+                HandleMessage($"Unexpected error occurred: {ex.Message}", false, true, true, LogLevel.Error);
             }
         }
 
@@ -634,14 +685,14 @@ namespace UI
         {
             if (e.Key == Key.S && (Keyboard.Modifiers & (ModifierKeys.Control | ModifierKeys.Shift)) == (ModifierKeys.Control | ModifierKeys.Shift))
             {
-
+                HandleMessage("Entered debug mode.", false, false, true, LogLevel.Debug);
             }
 
             if (e.Key == Key.H && (Keyboard.Modifiers & (ModifierKeys.Control | ModifierKeys.Shift)) == (ModifierKeys.Control | ModifierKeys.Shift))
             {
-
+                HandleMessage("Left debug mode.", false, false, true, LogLevel.Debug);
             }
         }
-                #endregion
+       #endregion
     }
 }

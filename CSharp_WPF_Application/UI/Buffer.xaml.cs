@@ -90,8 +90,6 @@ namespace UI
 
         public bool RemoveImage(int index)
         {
-            Console.WriteLine(index);
-            Console.WriteLine(VisibleCount);
             if (index >= 0 && index < VisibleCount)
             {
                 for (int i = index; i < VisibleCount - 1; i++)

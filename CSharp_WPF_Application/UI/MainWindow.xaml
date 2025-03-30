@@ -11,7 +11,7 @@
         FontFamily="Microsoft JhengHei"
         Background="SkyBlue"
         WindowStartupLocation="CenterScreen"
-        Title="Image Processing and Analysis" Height="420.0" Width="700.0" Closing="MainWindow_Closing">
+        Title="Image Processing and Analysis" Height="425.0" Width="605.0" Closing="MainWindow_Closing">
 
     <Control.Resources>
         <Style x:Key="buttonHover" TargetType="Button">
@@ -134,11 +134,6 @@
                                 <TextBlock x:Name="TextBlock_Reset" Text=" Reset"/>
                             </StackPanel>
                         </Button>
-                    </StackPanel>
-                    <StackPanel Orientation="Vertical">
-                        
-                        <Button x:Name="test1" Click="Btn_Click" Width="40" Height="40"/>
-                        <Button x:Name="test2" Click="Btn_Click" Width="40" Height="40"/>
                     </StackPanel>
                 </StackPanel>
             </StackPanel>

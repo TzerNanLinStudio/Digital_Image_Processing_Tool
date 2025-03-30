@@ -122,7 +122,9 @@ C:\Users\goodc\OneDrive\Desktop\Git\Digital_Image_Processing_and_Analysis_Tool\C
 C:\Users\goodc\OneDrive\Desktop\Git\Digital_Image_Processing_and_Analysis_Tool\CSharp_WPF_Application\ImageProcessing\bin\x64\Debug\Config_sharp.dll
 C:\Users\goodc\OneDrive\Desktop\Git\Digital_Image_Processing_and_Analysis_Tool\CSharp_WPF_Application\ImageProcessing\bin\x64\Debug\Emgu.CV.UI.dll
 C:\Users\goodc\OneDrive\Desktop\Git\Digital_Image_Processing_and_Analysis_Tool\CSharp_WPF_Application\ImageProcessing\bin\x64\Debug\Emgu.CV.World.dll
+C:\Users\goodc\OneDrive\Desktop\Git\Digital_Image_Processing_and_Analysis_Tool\CSharp_WPF_Application\ImageProcessing\bin\x64\Debug\LogRecorder.dll
 C:\Users\goodc\OneDrive\Desktop\Git\Digital_Image_Processing_and_Analysis_Tool\CSharp_WPF_Application\ImageProcessing\bin\x64\Debug\ZedGraph.dll
+C:\Users\goodc\OneDrive\Desktop\Git\Digital_Image_Processing_and_Analysis_Tool\CSharp_WPF_Application\ImageProcessing\bin\x64\Debug\LogRecorder.pdb
 C:\Users\goodc\OneDrive\Desktop\Git\Digital_Image_Processing_and_Analysis_Tool\CSharp_WPF_Application\ImageProcessing\bin\x64\Debug\Config_sharp.pdb
 C:\Users\goodc\OneDrive\Desktop\Git\Digital_Image_Processing_and_Analysis_Tool\CSharp_WPF_Application\ImageProcessing\bin\x64\Debug\Emgu.CV.UI.xml
 C:\Users\goodc\OneDrive\Desktop\Git\Digital_Image_Processing_and_Analysis_Tool\CSharp_WPF_Application\ImageProcessing\bin\x64\Debug\Emgu.CV.World.xml
@@ -145,5 +147,3 @@ C:\Users\goodc\OneDrive\Desktop\Git\Digital_Image_Processing_and_Analysis_Tool\C
 C:\Users\goodc\OneDrive\Desktop\Git\Digital_Image_Processing_and_Analysis_Tool\CSharp_WPF_Application\ImageProcessing\obj\x64\Debug\ImageProcessing.csproj.CopyComplete
 C:\Users\goodc\OneDrive\Desktop\Git\Digital_Image_Processing_and_Analysis_Tool\CSharp_WPF_Application\ImageProcessing\obj\x64\Debug\WindowsFormsApp.dll
 C:\Users\goodc\OneDrive\Desktop\Git\Digital_Image_Processing_and_Analysis_Tool\CSharp_WPF_Application\ImageProcessing\obj\x64\Debug\WindowsFormsApp.pdb
-C:\Users\goodc\OneDrive\Desktop\Git\Digital_Image_Processing_and_Analysis_Tool\CSharp_WPF_Application\ImageProcessing\bin\x64\Debug\LogRecorder.dll
-C:\Users\goodc\OneDrive\Desktop\Git\Digital_Image_Processing_and_Analysis_Tool\CSharp_WPF_Application\ImageProcessing\bin\x64\Debug\LogRecorder.pdb
