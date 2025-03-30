@@ -1,3 +1,6 @@
 # Ignore the build output and intermediate files directory used by Visual Studio
 .vs/
-CSharp_WPF_Application/UI/bin/x64/Debug/Appendix/Log/*
+CSharp_WPF_Application/**/[Dd]ebug/
+CSharp_WPF_Application/**/[Rr]elease/
+CSharp_WPF_Application/**/x86/
+CSharp_WPF_Application/**/x64/

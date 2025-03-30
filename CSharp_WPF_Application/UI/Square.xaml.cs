@@ -23,18 +23,31 @@ namespace UI
         public delegate void NumberHandler(bool temp);
         public event NumberHandler NumberHandleEvent;
 
+        /// <summary>
+        /// Constructor for the Square UserControl. Initializes UI components.
+        /// </summary>
         public Square()
         {
             InitializeComponent();
         }
 
-        // When the TextBox loses focus, update the TextBlock content and hide the TextBox
+        /// <summary>
+        /// Event handler for when the TextBox loses keyboard focus.
+        /// Commits the entered number and updates the UI accordingly.
+        /// </summary>
+        /// <param name="sender">Source of the event (TextBox).</param>
+        /// <param name="e">RoutedEventArgs containing event data.</param>
         private void TextBox_Number_LostFocus(object sender, RoutedEventArgs e)
         {
             UpdateNumber(); 
         }
 
-        // Handle Enter and Escape keys: Enter confirms input, Escape cancels the edit
+        /// <summary>
+        /// Event handler for key presses within the TextBox.
+        /// Enter key commits the value, while Escape key cancels the edit.
+        /// </summary>
+        /// <param name="sender">Source of the event (TextBox).</param>
+        /// <param name="e">KeyEventArgs containing details about the key pressed.</param>
         private void TextBox_Number_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.Enter)
@@ -49,7 +62,10 @@ namespace UI
             }
         }
 
-        // Update the value and hide the TextBox
+        /// <summary>
+        /// Updates the numeric value displayed, hides the TextBox, and shows the TextBlock.
+        /// Parses the TextBox input and updates the TextBlock accordingly.
+        /// </summary>
         private void UpdateNumber()
         {
             if (int.TryParse(TextBox_Number.Text, out int newValue))
@@ -60,7 +76,12 @@ namespace UI
             Text_Number.Visibility = Visibility.Visible; 
         }
 
-        // When the TextBlock is clicked, switch to the TextBox for editing
+        /// <summary>
+        /// Event handler for mouse clicks on the TextBlock.
+        /// Activates the TextBox for editing the displayed number.
+        /// </summary>
+        /// <param name="sender">Source of the event (TextBlock).</param>
+        /// <param name="e">MouseButtonEventArgs containing mouse click data.</param>
         private void Text_Number_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             TextBox_Number.Text = Text_Number.Text;

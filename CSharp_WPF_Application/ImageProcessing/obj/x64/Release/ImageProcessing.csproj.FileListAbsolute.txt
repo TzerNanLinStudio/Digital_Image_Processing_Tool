@@ -113,8 +113,6 @@ C:\Users\goodc\OneDrive\Desktop\Git\Digital_Image_Processing_and_Analysis_Tool\A
 C:\Users\goodc\OneDrive\Desktop\Git\Digital_Image_Processing_and_Analysis_Tool\AOI_StationK(V.2021.01.21)\ImageProcessing\obj\x64\Release\WindowsFormsApp.dll
 C:\Users\goodc\OneDrive\Desktop\Git\Digital_Image_Processing_and_Analysis_Tool\AOI_StationK(V.2021.01.21)\ImageProcessing\obj\x64\Release\WindowsFormsApp.pdb
 C:\Users\goodc\OneDrive\Desktop\Git\Digital_Image_Processing_and_Analysis_Tool\CSharp_WPF_Application\ImageProcessing\obj\x64\Release\ImageProcessing.csproj.AssemblyReference.cache
-C:\Users\goodc\OneDrive\Desktop\Git\Digital_Image_Processing_and_Analysis_Tool\CSharp_WPF_Application\ImageProcessing\obj\x64\Release\WindowsFormsApp.Properties.Resources.resources
-C:\Users\goodc\OneDrive\Desktop\Git\Digital_Image_Processing_and_Analysis_Tool\CSharp_WPF_Application\ImageProcessing\obj\x64\Release\ImageProcessing.csproj.GenerateResource.cache
 C:\Users\goodc\OneDrive\Desktop\Git\Digital_Image_Processing_and_Analysis_Tool\CSharp_WPF_Application\ImageProcessing\obj\x64\Release\ImageProcessing.csproj.CoreCompileInputs.cache
 C:\Users\goodc\OneDrive\Desktop\Git\Digital_Image_Processing_and_Analysis_Tool\CSharp_WPF_Application\ImageProcessing\obj\x64\Release\WindowsFormsApp.dll
 C:\Users\goodc\OneDrive\Desktop\Git\Digital_Image_Processing_and_Analysis_Tool\CSharp_WPF_Application\ImageProcessing\obj\x64\Release\WindowsFormsApp.pdb
@@ -148,3 +146,5 @@ C:\Users\goodc\OneDrive\Desktop\Git\Digital_Image_Processing_and_Analysis_Tool\C
 C:\Users\goodc\OneDrive\Desktop\Git\Digital_Image_Processing_and_Analysis_Tool\CSharp_WPF_Application\ImageProcessing\bin\x64\Release\zh-cn\ZedGraph.resources.dll
 C:\Users\goodc\OneDrive\Desktop\Git\Digital_Image_Processing_and_Analysis_Tool\CSharp_WPF_Application\ImageProcessing\bin\x64\Release\zh-tw\ZedGraph.resources.dll
 C:\Users\goodc\OneDrive\Desktop\Git\Digital_Image_Processing_and_Analysis_Tool\CSharp_WPF_Application\ImageProcessing\obj\x64\Release\ImageProcessing.csproj.CopyComplete
+C:\Users\goodc\OneDrive\Desktop\Git\Digital_Image_Processing_and_Analysis_Tool\CSharp_WPF_Application\ImageProcessing\bin\x64\Release\LogRecorder.dll
+C:\Users\goodc\OneDrive\Desktop\Git\Digital_Image_Processing_and_Analysis_Tool\CSharp_WPF_Application\ImageProcessing\bin\x64\Release\LogRecorder.pdb

@@ -90,8 +90,6 @@ namespace Config
         {
             try
             {
-                //FileFolderSelector();
-
                 if (IsRecipeExist)
                 {
                     ReadConfig(RecipeFullPath);
@@ -99,7 +97,7 @@ namespace Config
                 }
                 else
                 {
-                    MessageBox.Show("Config file: \"" + Path.GetFileName(RecipeFullPath)+"\" is not exit in:\n\"" + Path.GetDirectoryName(Path.GetFullPath(RecipeFullPath)) + "\\\"", 
+                    MessageBox.Show("Config file: \"" + Path.GetFileName(RecipeFullPath)+"\" is not exist in:\n\"" + Path.GetDirectoryName(Path.GetFullPath(RecipeFullPath)) + "\\\"", 
                         "Config Load Warrning", 
                         MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 }
@@ -207,11 +205,6 @@ namespace Config
                 // 反序列化
                 // Deserializes "XML Buffer" into "Class Object"
                 customObject = (T)(Serializer.Deserialize(xmlReader));
-
-                //用完記得關或使用using(python的with...as)
-                // Close and release any resouces of current streams                
-                //decryptStream.Close();
-                //fileStream.Close();
 
                 // By Dispose(), Releases all resources used by the Stream object.
                 decryptStream.Dispose();

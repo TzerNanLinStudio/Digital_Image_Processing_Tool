@@ -8,6 +8,6 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-[assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute("icon/reset.ico")]
+[assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute("icon/copy.ico")]
 
 

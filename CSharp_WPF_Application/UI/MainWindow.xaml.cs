@@ -158,13 +158,6 @@ namespace UI
         {
             try
             {
-                // 暫時紀錄代辦任務，完成後即可刪除
-                Console.WriteLine("美化英文UI");
-                Console.WriteLine("無config檔案使用預設");
-                Console.WriteLine("完成基本英文註解");
-                Console.WriteLine("完成todo");
-                Console.WriteLine("清除不必要檔案");
-
                 EnsureDirectoriesExist();
                 InitializeConfig(true);
                 InitializeLogFiles(_logFileDirectoryPath + _logFileNamePrefix);

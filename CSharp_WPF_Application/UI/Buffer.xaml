@@ -10,7 +10,7 @@
              MinWidth="100" MaxWidth="100" MinHeight="240" MaxHeight="240">
 
     <Grid>
-        <StackPanel x:Name="StackPanel_TwelveRadioButton" Background="Orange">
+        <StackPanel x:Name="StackPanel_TwelveRadioButton" Background="DeepSkyBlue">
                 <RadioButton Content="Image" Height="20" Width="100" Visibility="Hidden"  Checked="RadioButton_Checked"/>
                 <RadioButton Content="Image" Height="20" Width="100" Visibility="Hidden" Checked="RadioButton_Checked"/>
                 <RadioButton Content="Image" Height="20" Width="100" Visibility="Hidden" Checked="RadioButton_Checked"/>

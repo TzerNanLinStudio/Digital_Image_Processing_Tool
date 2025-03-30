@@ -57,25 +57,25 @@
                     <StackPanel Orientation="Vertical">
                         <Button  x:Name="Btn_Open" Width="100" Height="30" Click="Btn_Click" Style="{StaticResource buttonHover}">
                             <StackPanel Orientation="Horizontal">
-                                <Image Height="12" x:Name="Image_Open" Source="/Icon/OpenImage.ico"/>
+                                <Image Height="12" x:Name="Image_Open" Source="/Icon/Open.ico"/>
                                 <TextBlock x:Name="TextBlock_Open" Text=" Open"/>
                             </StackPanel>
                         </Button>
                         <Button x:Name="Btn_Save" Width="100" Height="30" Click="Btn_Click" Style="{StaticResource buttonHover}">
                             <StackPanel Orientation="Horizontal">
-                                <Image x:Name="Image_Save" Source="/Icon/SaveImage.ico" Height="12"/>
+                                <Image x:Name="Image_Save" Source="/Icon/Save.ico" Height="12"/>
                                 <TextBlock x:Name="TextBlock_Save" Text=" Save"/>
                             </StackPanel>
                         </Button>
                         <Button x:Name="Btn_Copy" Width="100" Height="30" Click="Btn_Click" Style="{StaticResource buttonHover}">
                             <StackPanel Orientation="Horizontal">
-                                <Image x:Name="Image_Copy" Source="/Icon/SaveImage.ico" Height="12"/>
+                                <Image x:Name="Image_Copy" Source="/Icon/Copy.ico" Height="12"/>
                                 <TextBlock x:Name="TextBlock_Copy" Text=" Copy"/>
                             </StackPanel>
                         </Button>
                         <Button x:Name="Btn_Delete" Width="100" Height="30" Click="Btn_Click" Style="{StaticResource buttonHover}">
                             <StackPanel Orientation="Horizontal">
-                                <Image x:Name="Image_Delete" Source="/Icon/SaveImage.ico" Height="12"/>
+                                <Image x:Name="Image_Delete" Source="/Icon/Delete.ico" Height="12"/>
                                 <TextBlock x:Name="TextBlock_Delete" Text=" Delete"/>
                             </StackPanel>
                         </Button>
@@ -122,7 +122,7 @@
                                 </Button>
                                 <Button x:Name="Btn_ROI"  Width="100" Height="30" Click="Btn_Click" Style="{StaticResource buttonHover}">
                                     <StackPanel Orientation="Horizontal">
-                                        <Image x:Name="Image_ROI" Source="/Icon/SetROI.ico" Height="12"/>
+                                        <Image x:Name="Image_ROI" Source="/Icon/Set.ico" Height="12"/>
                                         <TextBlock x:Name="TextBlock_ROI" Text=" ROI"/>
                                     </StackPanel>
                                 </Button>

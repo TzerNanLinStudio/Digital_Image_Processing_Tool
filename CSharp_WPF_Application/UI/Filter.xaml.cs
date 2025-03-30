@@ -20,10 +20,12 @@ namespace UI
     /// </summary>
     public partial class Filter : UserControl
     {
-       // public delegate void FilterHandler(float[,] kernel, bool temp);
         public delegate void FilterHandler(float[][] kernel, bool temp);
         public event FilterHandler FilterHandleEvent;
 
+        /// <summary>
+        /// Constructor for the Filter UserControl. Initializes components and subscribes to child controls' events.
+        /// </summary>
         public Filter()
         {
             InitializeComponent();
@@ -37,19 +39,27 @@ namespace UI
             }
         }
 
-        // Handle right mouse button click on StackPanel_NineSquare
+        /// <summary>
+        /// Handles the MouseRightButtonDown event on the StackPanel_NineSquare to trigger filter update.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">MouseButtonEventArgs containing event data.</param>
         private void StackPanel_NineSquare_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
         {
             UpFilter(false);
         }
 
+        /// <summary>
+        /// Collects current numeric values from the UI into a 3x3 kernel array and triggers the FilterHandleEvent.
+        /// </summary>
+        /// <param name="temp">A boolean flag indicating if the update is temporary.</param>
         private void UpFilter(bool temp)
         {
             // Initialize a 3x3 jagged float array, assuming StackPanel is a 3x3 grid
             float[][] kernel = new float[3][];
             for (int x = 0; x < 3; x++)
             {
-                kernel[x] = new float[3]; // Initialize each row
+                kernel[x] = new float[3]; 
             }
 
             for (int x = 0; x < StackPanel_NineSquare.Children.Count; x++)

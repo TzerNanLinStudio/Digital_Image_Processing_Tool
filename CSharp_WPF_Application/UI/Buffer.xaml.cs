@@ -36,6 +36,9 @@ namespace UI
         public delegate void BufferHandler(int index = -1);
         public event BufferHandler BufferHandleEvent;
 
+        /// <summary>
+        /// Constructor initializes the buffer with default values and images.
+        /// </summary>
         public Buffer()
         {
             InitializeComponent();
@@ -49,6 +52,11 @@ namespace UI
             for (int i = 0; i < StackPanel_TwelveRadioButton.Children.Count; i++) ImgSource[i] = ImgNull.Clone();
         }
 
+        /// <summary>
+        /// Retrieves a clone of the image at the specified index.
+        /// </summary>
+        /// <param name="index">Index of the image to retrieve.</param>
+        /// <returns>A cloned Image if index is valid; otherwise, a default empty image.</returns>
         public Image<Bgr, byte> GetImage(int index)
         {
             if (index >= 0 && index < VisibleCount)
@@ -59,6 +67,13 @@ namespace UI
             return ImgNull.Clone();
         }
 
+        /// <summary>
+        /// Adds an image to the buffer at the specified index, updating UI accordingly.
+        /// </summary>
+        /// <param name="index">Index at which to insert the new image.</param>
+        /// <param name="text">Display text for the associated RadioButton.</param>
+        /// <param name="image">The image to add to the buffer.</param>
+        /// <returns>True if addition is successful; otherwise, false.</returns>
         public bool AddImage(int index, string text, Image<Bgr, byte> image)
         {
             if (VisibleCount < StackPanel_TwelveRadioButton.Children.Count)
@@ -88,6 +103,11 @@ namespace UI
             return false;
         }
 
+        /// <summary>
+        /// Removes the image at the specified index and updates visibility.
+        /// </summary>
+        /// <param name="index">Index of the image to remove.</param>
+        /// <returns>True if removal is successful; otherwise, false.</returns>
         public bool RemoveImage(int index)
         {
             if (index >= 0 && index < VisibleCount)
@@ -106,6 +126,10 @@ namespace UI
             return false; 
         }
 
+        /// <summary>
+        /// Updates visibility of RadioButtons based on the current count of images.
+        /// </summary>
+        /// <param name="count">Number of RadioButtons to set as visible.</param>
         public void UpdateBufferVisibility(int count)
         {
             if (count > 0 && count <= StackPanel_TwelveRadioButton.Children.Count)
@@ -118,17 +142,14 @@ namespace UI
         }
 
         /// <summary>
-        /// 重置StackPanel中所有RadioButton为未选中状态
+        /// Resets all RadioButtons in the StackPanel to an unchecked state.
         /// </summary>
         public void ResetAllRadioButtons()
         {
-            // 遍历StackPanel_TwelveRadioButton中的所有子元素
             foreach (var child in StackPanel_TwelveRadioButton.Children)
             {
-                // 检查子元素是否为RadioButton
                 if (child is RadioButton radioButton)
                 {
-                    // 将RadioButton设置为未选中状态
                     radioButton.IsChecked = false;
                 }
             }
@@ -136,6 +157,9 @@ namespace UI
             CurrentIndex = -1;
         }
 
+        /// <summary>
+        /// Event handler triggered when a RadioButton is checked. Updates current selection and triggers event.
+        /// </summary>
         private void RadioButton_Checked(object sender, RoutedEventArgs e)
         {
             CurrentIndex = StackPanel_TwelveRadioButton.Children.IndexOf(sender as RadioButton);

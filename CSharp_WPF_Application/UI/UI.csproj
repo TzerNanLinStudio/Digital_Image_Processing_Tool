@@ -212,20 +212,14 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Icon\SaveImage.ico" />
+    <Resource Include="Icon\Save.ico" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Icon\SaveParameter.ico" />
+    <Resource Include="Icon\Grab.ico" />
+    <Resource Include="Icon\Open.ico" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Icon\GrabImage.ico" />
-    <Resource Include="Icon\OpenImage.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Icon\SetROI.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Icon\SaveSample.ico" />
+    <Resource Include="Icon\Set.ico" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Icon\Start.ico" />
@@ -242,10 +236,7 @@
     <Resource Include="Icon\Unlock.ico" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Icon\CloseWindow.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Icon\TrashCan.ico" />
+    <Resource Include="Icon\Close.ico" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Icon\GreenSign.ico" />
@@ -258,6 +249,12 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Icon\Reset.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Icon\Delete.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Icon\Copy.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\EMGU.CV.4.1.1.3497\build\EMGU.CV.targets" Condition="Exists('..\packages\EMGU.CV.4.1.1.3497\build\EMGU.CV.targets')" />

@@ -40,7 +40,7 @@ namespace Config
 
     public class CustomConfig_UI : BaseConfig<CustomConfig_UI>
     {
-        private string _version = "UIConfig_202004081500";
+        private string _version = "UIConfig_202503301630";
 
         public CustomConfig_UI_Parameters parameters;
 
@@ -49,8 +49,8 @@ namespace Config
             version = _version;
 
             parameters = new CustomConfig_UI_Parameters();
-            // Default Path
-            RecipeFullPath = "./recipt.bat";
+            
+            RecipeFullPath = "./recipt.bat"; // Default Path
         }
 
         public CustomConfig_UI(string fileFullPath)
