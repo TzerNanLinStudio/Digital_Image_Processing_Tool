@@ -114,7 +114,6 @@ namespace UI
             {
                 for (int i = index; i < VisibleCount - 1; i++)
                 {
-                    Console.WriteLine(i);
                     ImgSource[i] = ImgSource[i + 1].Clone();
                 }
 
@@ -132,7 +131,7 @@ namespace UI
         /// <param name="count">Number of RadioButtons to set as visible.</param>
         public void UpdateBufferVisibility(int count)
         {
-            if (count > 0 && count <= StackPanel_TwelveRadioButton.Children.Count)
+            if (count >= 0 && count <= StackPanel_TwelveRadioButton.Children.Count)
             {
                 for (int i = 0; i < StackPanel_TwelveRadioButton.Children.Count; i++)
                 {

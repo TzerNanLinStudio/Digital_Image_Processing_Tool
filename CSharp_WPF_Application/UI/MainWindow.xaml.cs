@@ -541,9 +541,9 @@ namespace UI
 
                         case "Btn_Gray":
                             {
-                                if (Buffer_x12.AddImage(Buffer_x12.VisibleCount, "Grayscale Image", BasicAlgorithm.ToBGR(BasicAlgorithm.ToGray(Buffer_x12.GetImage(Buffer_x12.CurrentIndex)))))
+                                if (Buffer_x12.AddImage(Buffer_x12.VisibleCount, "Gray Image", BasicAlgorithm.ToBGR(BasicAlgorithm.ToGray(Buffer_x12.GetImage(Buffer_x12.CurrentIndex)))))
                                 {
-                                    HandleMessage("Grayscale image successfully added to buffer.", false, true, true, LogLevel.General);
+                                    HandleMessage("Gray image successfully added to buffer.", false, true, true, LogLevel.General);
                                 }
                                 else
                                 {

@@ -8,28 +8,58 @@ The latest version of the application boasted a wealth of image-processing funct
 
 # 2. Implementation
 
-## 2.1. Version of C++ and Windows Form
+## 2.1. Version of C# and WPF
 
-The following is an example of finding feature contours through digital image processing technology in this auxiliary tool. 
+The following is an example of image analysis through digital image processing technology in this auxiliary tool. 
 
-![Image Error](./CPlusPlus_WindowsForm_Application/Image/image_01.png)
+![Image Error](./Figure/CS_01.png)
 
 The above screenshot is application's initial user interface.
 
-![Image Error](./CPlusPlus_WindowsForm_Application/Image/image_02.png)
+![Image Error](./Figure/CS_02.png)
 
 The above screenshot shows how to load the image.
 
-![Image Error](./CPlusPlus_WindowsForm_Application/Image/image_03.png)
+![Image Error](./Figure/CS_03.png)
 
 The above screenshot shows how to make the image grayscale.
 
-![Image Error](./CPlusPlus_WindowsForm_Application/Image/image_04.png)
+![Image Error](./Figure/CS_04.png)
 
 The above screenshot shows how to binarize the image.
 
-![Image Error](./CPlusPlus_WindowsForm_Application/Image/image_05.png)
+![Image Error](./Figure/CS_05.png)
+
+The above screenshot shows how to perform image processing using a custom filter.
+
+![Image Error](./Figure/CS_06.png)
+
+The above screenshot shows how to apply the dilation process.
+
+![Image Error](./Figure/CS_07.png)
+
+The above screenshot shows how to apply the erosion process.
+
+## 2.2. Version of C++ and Windows Form
+
+The following is an example of finding feature contours through digital image processing technology in this auxiliary tool. 
+
+![Image Error](./Figure/CPP_01.png)
+
+The above screenshot is application's initial user interface.
+
+![Image Error](./Figure/CPP_02.png)
+
+The above screenshot shows how to load the image.
+
+![Image Error](./Figure/CPP_03.png)
+
+The above screenshot shows how to make the image grayscale.
+
+![Image Error](./Figure/CPP_04.png)
+
+The above screenshot shows how to binarize the image.
+
+![Image Error](./Figure/CPP_05.png)
 
 The above screenshot shows how to find circular contours.
-
-## 2.2. Version of C# and WPF
