@@ -1,0 +1,45 @@
+﻿<UserControl x:Class="UI.Square"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:UI"
+             mc:Ignorable="d" 
+             FontSize="12"
+             FontFamily="Microsoft JhengHei"
+             MinWidth="30" MaxWidth="30" MinHeight="30" MaxHeight="30">
+    
+    <Grid Background="Black">
+        <Grid.RowDefinitions >
+            <RowDefinition x:Name="GridRowDef_0" Height="2"/>
+            <RowDefinition x:Name="GridRowDef_1" Height="26"/>
+            <RowDefinition x:Name="GridRowDef_2" Height="2"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions >
+            <ColumnDefinition x:Name="GridColDef_0" Width="2"/>
+            <ColumnDefinition x:Name="GridColDef_1" Width="26"/>
+            <ColumnDefinition x:Name="GridColDef_2" Width="2"/>
+        </Grid.ColumnDefinitions>
+
+        <Border x:Name="Border_Main"  Grid.Column="1" Grid.Row="1" Background="Gray" x:FieldModifier="public">
+            <Grid>
+                <TextBlock x:Name="Text_Number" Text="0" 
+                                   Foreground="White" 
+                                   HorizontalAlignment="Center" 
+                                   VerticalAlignment="Center"
+                                   FontSize="14"
+                                   x:FieldModifier="public"
+                                   MouseLeftButtonDown="Text_Number_MouseLeftButtonDown"/>
+                <TextBox x:Name="TextBox_Number" Visibility="Collapsed"
+                                 HorizontalAlignment="Center"
+                                 VerticalAlignment="Center"
+                                 FontSize="14"
+                                 Width="20"
+                                 Height="20"
+                                 x:FieldModifier="public"
+                                 LostFocus="TextBox_Number_LostFocus"
+                                 KeyDown="TextBox_Number_KeyDown"/>
+            </Grid>
+        </Border>
+    </Grid>
+</UserControl>
